@@ -42,18 +42,19 @@ const UserResults = () => {
   const isDesktop = useIsDesktop(992);
 
   const columns = [
-    { name: t('Username', 'نام کاربری'), selector: (row) => row.username, sortable: true, width: '200px' },
-    { name: t('Age', 'سن'), selector: (row) => row.age, sortable: true, width: '100px' },
-    { name: t('Gender', 'جنسیت'), selector: (row) => (row.gender === 'female' ? t('female', 'زن') : t('male', 'مرد')), sortable: true, width: '120px' },
-    { name: t('Test Number', 'شماره آزمون'), selector: (row) => row.test_number, sortable: true, width: '150px' },
-    { name: t('Round 1 Score', 'امتیاز دور ۱'), selector: (row) => row.round1 ?? '-', sortable: true, width: '160px' },
-    { name: t('Round 2 Score', 'امتیاز دور ۲'), selector: (row) => row.round2 ?? '-', sortable: true, width: '160px' },
-    { name: t('Round 3 Score', 'امتیاز دور ۳'), selector: (row) => row.round3 ?? '-', sortable: true, width: '160px' },
-    { name: t('Round 4 Score', 'امتیاز دور ۴'), selector: (row) => row.round4 ?? '-', sortable: true, width: '160px' },
-    { name: t('Round 5 Score', 'امتیاز دور ۵'), selector: (row) => row.round5 ?? '-', sortable: true, width: '160px' },
-    { name: t('Test Time', 'تاریخ آزمون'), selector: (row) => row.test_time, sortable: true, width: '250px' },
-    { name: t('Approved', 'تایید شده'), selector: (row) => (row.approved === 'Yes' ? t('Yes', 'بله') : t('No', 'خیر')), sortable: true, width: '150px' },
-    { name: t('Total Score', 'مجموع امتیاز'), selector: (row) => row.total_score, sortable: true, width: '160px' },
+    { name: t('Username', 'نام کاربری'), selector: (row) => row.username, sortable: true, width: '180px' },
+    { name: t('Age', 'سن'), selector: (row) => row.age, sortable: true, width: '80px' },
+    { name: t('Gender', 'جنسیت'), selector: (row) => (row.gender === 'female' ? t('female', 'زن') : t('male', 'مرد')), sortable: true, width: '110px' },
+    { name: t('Test Number', 'شماره آزمون'), selector: (row) => row.test_number, sortable: true, width: '120px' },
+    { name: t('Attempt', 'تلاش'), selector: (row) => row.attempt_number, sortable: true, width: '100px' },
+    { name: t('Round 1 Score', 'امتیاز دور ۱'), selector: (row) => row.round1 ?? '-', sortable: true, width: '130px' },
+    { name: t('Round 2 Score', 'امتیاز دور ۲'), selector: (row) => row.round2 ?? '-', sortable: true, width: '130px' },
+    { name: t('Round 3 Score', 'امتیاز دور ۳'), selector: (row) => row.round3 ?? '-', sortable: true, width: '130px' },
+    { name: t('Round 4 Score', 'امتیاز دور ۴'), selector: (row) => row.round4 ?? '-', sortable: true, width: '130px' },
+    { name: t('Round 5 Score', 'امتیاز دور ۵'), selector: (row) => row.round5 ?? '-', sortable: true, width: '130px' },
+    { name: t('Test Time', 'تاریخ آزمون'), selector: (row) => row.test_time, sortable: true, width: '230px' },
+    { name: t('Approved', 'تایید شده'), selector: (row) => (row.approved === 'Yes' ? t('Yes', 'بله') : t('No', 'خیر')), sortable: true, width: '130px' },
+    { name: t('Total Score', 'مجموع امتیاز'), selector: (row) => row.total_score, sortable: true, width: '140px' },
   ];
 
   const [adminInfo, setAdminInfo] = useState({ username: '', profile_photo: '' });
@@ -85,25 +86,12 @@ const UserResults = () => {
       const response = await fetch(`/api/admin/user-results?${query}`);
       if (response.ok) {
         const result = await response.json();
-        const grouped = {};
-        result.forEach((item) => {
-          const key = `${item.username}-${item.test_number}`;
-          if (!grouped[key]) {
-            grouped[key] = {
-              id: key,
-              username: item.username,
-              age: item.age,
-              gender: item.sex,
-              test_number: item.test_number,
-              test_time: new Date(item.test_time).toLocaleString(),
-              approved: item.approved,
-              total_score: item.total_score,
-            };
-          }
-          grouped[key][`round${item.round_number}`] = item.score;
-          grouped[key].test_time = new Date(item.test_time).toLocaleString();
-        });
-        setData(Object.values(grouped));
+        const rows = result.map((item) => ({
+          ...item,
+          id: `${item.username}-${item.test_number}-${item.attempt_number}`,
+          test_time: item.test_time ? new Date(item.test_time).toLocaleString() : ''
+        }));
+        setData(rows);
         const uniqueUsers = [...new Set(result.map((item) => item.username))];
         setUserOptions(uniqueUsers);
       }

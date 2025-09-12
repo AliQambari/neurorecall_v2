@@ -51,15 +51,16 @@ const UserProfileHome = () => {
   const t = (en, fa) => (language === 'en' ? en : fa);
 
   const columns = [
-    { name: t('Test Number', 'شماره آزمون'), selector: (row) => row.test_number, sortable: true, width: '150px' },
-    { name: t('Round 1 Score', 'امتیاز دور ۱'), selector: (row) => row.round1 ?? '-', sortable: true, width: '160px' },
-    { name: t('Round 2 Score', 'امتیاز دور ۲'), selector: (row) => row.round2 ?? '-', sortable: true, width: '160px' },
-    { name: t('Round 3 Score', 'امتیاز دور ۳'), selector: (row) => row.round3 ?? '-', sortable: true, width: '160px' },
-    { name: t('Round 4 Score', 'امتیاز دور ۴'), selector: (row) => row.round4 ?? '-', sortable: true, width: '160px' },
-    { name: t('Round 5 Score', 'امتیاز دور ۵'), selector: (row) => row.round5 ?? '-', sortable: true, width: '160px' },
-    { name: t('Test End Time', 'زمان پایان آزمون'), selector: (row) => row.test_time, sortable: true, width: '220px' },
-    { name: t('Approved', 'تایید شده'), selector: (row) => (row.approved === 'Yes' ? t('Yes', 'بله') : t('No', 'خیر')), sortable: true, width: '120px' },
-    { name: t('Total Score', 'مجموع امتیاز'), selector: (row) => row.total_score, sortable: true, width: '150px' },
+    { name: t('Test Number', 'شماره آزمون'), selector: (row) => row.test_number, sortable: true, width: '130px' },
+    { name: t('Attempt', 'تلاش'), selector: (row) => row.attempt_number, sortable: true, width: '110px' },
+    { name: t('Round 1 Score', 'امتیاز دور ۱'), selector: (row) => row.round1 ?? '-', sortable: true, width: '140px' },
+    { name: t('Round 2 Score', 'امتیاز دور ۲'), selector: (row) => row.round2 ?? '-', sortable: true, width: '140px' },
+    { name: t('Round 3 Score', 'امتیاز دور ۳'), selector: (row) => row.round3 ?? '-', sortable: true, width: '140px' },
+    { name: t('Round 4 Score', 'امتیاز دور ۴'), selector: (row) => row.round4 ?? '-', sortable: true, width: '140px' },
+    { name: t('Round 5 Score', 'امتیاز دور ۵'), selector: (row) => row.round5 ?? '-', sortable: true, width: '140px' },
+    { name: t('Test End Time', 'زمان پایان آزمون'), selector: (row) => row.test_time, sortable: true, width: '200px' },
+    { name: t('Approved', 'تایید شده'), selector: (row) => (row.approved === 'Yes' ? t('Yes', 'بله') : t('No', 'خیر')), sortable: true, width: '110px' },
+    { name: t('Total Score', 'مجموع امتیاز'), selector: (row) => row.total_score, sortable: true, width: '130px' },
   ];
 
   useEffect(() => {
@@ -68,23 +69,13 @@ const UserProfileHome = () => {
       const res = await fetch(`/api/user-profile?${qs}`);
       const result = await res.json();
       if (res.ok) {
-        const grouped = {};
-        result.scores.forEach((item) => {
-          const testId = item.test_number;
-          if (!grouped[testId]) {
-            grouped[testId] = {
-              id: testId,
-              test_number: item.test_number,
-              test_time: new Date(item.test_time).toLocaleString(),
-              approved: item.approved,
-              total_score: item.total_score,
-            };
-          }
-          grouped[testId][`round${item.round_number}`] = item.score;
-          grouped[testId].test_time = new Date(item.test_time).toLocaleString();
-        });
+        const rows = result.scores.map((item) => ({
+          ...item,
+          id: `${item.test_number}-${item.attempt_number}`,
+          test_time: item.test_time ? new Date(item.test_time).toLocaleString() : ''
+        }));
         setUserData(result.user);
-        setData(Object.values(grouped));
+        setData(rows);
       }
     };
     load();
