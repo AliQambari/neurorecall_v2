@@ -46,33 +46,38 @@ def api_user_profile():
 
     all_scores = q.all()
 
-    # approved/total logic
-    approved = set()
-    totals = {}
+    # Group by (test_number, attempt_number)
+    from collections import defaultdict
+    groups = defaultdict(list)
     for s in all_scores:
-        key = (s.user_id, s.test_number)
-        if key in approved:
-            continue
-        group = Score.query.filter_by(user_id=s.user_id, test_number=s.test_number).all()
-        rounds = {g.round_number for g in group}
-        if rounds == {1, 2, 3, 4, 5} and sorted(
-            [g.test_time for g in group]
-        ) == [g.test_time for g in sorted(group, key=lambda x: x.round_number)]:
-            approved.add(key)
-            totals[key] = sum(g.score for g in group)
+        groups[(s.test_number, getattr(s, 'attempt_number', 1))].append(s)
 
-    # build a flat list of rows
     rows = []
-    for s in all_scores:
-        key = (s.user_id, s.test_number)
-        rows.append({
-            'test_number': s.test_number,
-            'round_number': s.round_number,
-            'score': s.score,
-            'test_time': s.test_time.isoformat(),
-            'approved': 'Yes' if key in approved else 'No',
-            'total_score': totals.get(key, 'N/A')
-        })
+    for (test_number, attempt_number), items in groups.items():
+        # sort by round_number to compute approval and end time
+        items_sorted = sorted(items, key=lambda x: x.round_number)
+        round_set = {it.round_number for it in items_sorted}
+        times = [it.test_time for it in items_sorted]
+        approved = (round_set == {1, 2, 3, 4, 5} and times == sorted(times))
+        total_score = sum(it.score for it in items_sorted) if approved else 'N/A'
+        # build row with round1..round5
+        row = {
+            'test_number': test_number,
+            'attempt_number': attempt_number,
+            'round1': next((it.score for it in items_sorted if it.round_number == 1), None),
+            'round2': next((it.score for it in items_sorted if it.round_number == 2), None),
+            'round3': next((it.score for it in items_sorted if it.round_number == 3), None),
+            'round4': next((it.score for it in items_sorted if it.round_number == 4), None),
+            'round5': next((it.score for it in items_sorted if it.round_number == 5), None),
+            # use last round time as test end time if exists, else latest time
+            'test_time': (max(times).isoformat() if times else None),
+            'approved': 'Yes' if approved else 'No',
+            'total_score': total_score
+        }
+        rows.append(row)
+
+    # sort rows by test_number then attempt_number desc (latest first)
+    rows.sort(key=lambda r: (r['test_number'], r['attempt_number']))
 
     return jsonify({
         "user": {

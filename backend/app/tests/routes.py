@@ -62,10 +62,27 @@ def submit_audio():
 
         score, correct_words, incorrect_words = calculate_score(text, test_number)
 
-        # ذخیره نمره
+        # ذخیره نمره با مدیریت تلاش‌ها (attempt)
         user_id = current_user.id
+
+        # آخرین شماره تلاش برای این تست را پیدا کن
+        max_attempt = db.session.query(db.func.max(Score.attempt_number)).filter_by(
+            user_id=user_id, test_number=test_number
+        ).scalar() or 0
+
+        if round_number == 1:
+            # شروع تلاش جدید
+            attempt_number = max_attempt + 1
+        else:
+            # ادامه آخرین تلاش موجود؛ اگر وجود ندارد، تلاش 1 را شروع کن
+            attempt_number = max_attempt if max_attempt > 0 else 1
+
+        # اگر همان دور در همان تلاش ارسال شود، رکورد را جایگزین کن
         score_entry = Score.query.filter_by(
-            user_id=user_id, test_number=test_number, round_number=round_number
+            user_id=user_id,
+            test_number=test_number,
+            attempt_number=attempt_number,
+            round_number=round_number
         ).first()
 
         if score_entry:
@@ -77,6 +94,7 @@ def submit_audio():
             score_entry = Score(
                 user_id=user_id,
                 test_number=test_number,
+                attempt_number=attempt_number,
                 round_number=round_number,
                 score=score,
                 correct_words=correct_words,

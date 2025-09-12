@@ -21,13 +21,13 @@ def admin_required(f):
 @admin_required
 def api_user_results():
     """
-    Returns all user test results for admin.
-    Supports optional filters:
-    - username: filter by username
-    - test_number: filter by test number
-    - test_time: filter by ISO datetime string (e.g., "2025-08-13T14:30")
+    Returns user test results grouped per attempt for admin.
+    Optional filters:
+    - username
+    - test_number
+    - test_time (ISO string)
     """
-    
+
     # Filters
     filter_username = request.args.get('username')
     filter_test_number = request.args.get('test_number')
@@ -38,7 +38,7 @@ def api_user_results():
 
     if filter_username:
         scores_query = scores_query.filter(User.username == filter_username)
-    
+
     if filter_test_number:
         try:
             scores_query = scores_query.filter(Score.test_number == int(filter_test_number))
@@ -58,37 +58,40 @@ def api_user_results():
 
     scores = scores_query.all()
 
-    # Compute approved tests and total scores
-    approved_tests = set()
-    total_scores = {}
+    # Group by (user_id, test_number, attempt_number)
+    from collections import defaultdict
+    groups = defaultdict(list)
+    for s in scores:
+        groups[(s.user_id, s.test_number, getattr(s, 'attempt_number', 1))].append(s)
 
-    for score in scores:
-        key = (score.user_id, score.test_number)
-        if key in approved_tests:
-            continue
-        test_scores = Score.query.filter_by(user_id=score.user_id, test_number=score.test_number).all()
-        rounds = [s.round_number for s in test_scores]
-        if set(range(1, 6)) == set(rounds):
-            times = [s.test_time for s in sorted(test_scores, key=lambda x: x.round_number)]
-            if times == sorted(times):
-                approved_tests.add(key)
-                total_scores[key] = sum(s.score for s in test_scores)
-
-    # Build response
     result = []
-    for score in scores:
-        key = (score.user_id, score.test_number)
-        result.append({
-            'username': score.user.username,
-            'age': score.user.age,
-            'sex': score.user.sex,
-            'test_number': score.test_number,
-            'round_number': score.round_number,
-            'score': score.score,
-            'test_time': score.test_time.isoformat(),
-            'approved': 'Yes' if key in approved_tests else 'No',
-            'total_score': total_scores.get(key, 'N/A')
-        })
+    for (user_id, test_number, attempt_number), items in groups.items():
+        items_sorted = sorted(items, key=lambda x: x.round_number)
+        round_set = {it.round_number for it in items_sorted}
+        times = [it.test_time for it in items_sorted]
+        approved = (round_set == {1, 2, 3, 4, 5} and times == sorted(times))
+        total_score = sum(it.score for it in items_sorted) if approved else 'N/A'
+
+        user = items_sorted[0].user
+        row = {
+            'username': user.username,
+            'age': user.age,
+            'sex': user.sex,
+            'test_number': test_number,
+            'attempt_number': attempt_number,
+            'round1': next((it.score for it in items_sorted if it.round_number == 1), None),
+            'round2': next((it.score for it in items_sorted if it.round_number == 2), None),
+            'round3': next((it.score for it in items_sorted if it.round_number == 3), None),
+            'round4': next((it.score for it in items_sorted if it.round_number == 4), None),
+            'round5': next((it.score for it in items_sorted if it.round_number == 5), None),
+            'test_time': (max(times).isoformat() if times else None),
+            'approved': 'Yes' if approved else 'No',
+            'total_score': total_score,
+        }
+        result.append(row)
+
+    # sort results
+    result.sort(key=lambda r: (r['username'], r['test_number'], r['attempt_number']))
 
     return jsonify(result)
 
