@@ -1,5 +1,5 @@
 // src/components/Test.jsx
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useAudioRecorder } from "react-audio-voice-recorder";
 import "./Test.css";
 import { useDropzone } from "react-dropzone";
@@ -116,6 +116,8 @@ export default function Test() {
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  const inputRef = useRef(null);
 
   const { language } = useLanguage();
 
@@ -287,26 +289,7 @@ export default function Test() {
 
   // Choose file handler
   const handleFileSelect = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'audio/*';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const validation = validateAudioFile(file);
-
-        if (!validation.valid) {
-          showError(validation.key);
-          return;
-        }
-
-        setUploadState(true);
-        setUploadedFile(file);
-        setErrorKey(null);
-        setServerError(null);
-      }
-    };
-    input.click();
+    inputRef.current?.click();
   };
 
   return (
@@ -388,7 +371,7 @@ export default function Test() {
         {/* Upload Section */}
         <div className="col-12 col-lg-5 text-center">
           <div className="upload" {...getRootProps()}>
-            <input {...getInputProps()} />
+            <input {...getInputProps({ ref: inputRef })} />
             <img
               src={"../../../images/feather_upload-cloud.png"}
               className="mx-auto d-block my-4"

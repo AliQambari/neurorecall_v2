@@ -128,22 +128,34 @@ const UserProfileHome = () => {
             {/* Filters */}
             <form className="profile-filters" onSubmit={(e) => e.preventDefault()}>
               <div className="filters-grid">
-                <input
-                  name="test_number"
-                  className="form-control search-input"
-                  type="text"
-                  placeholder={t('Filter By Test Number', 'فیلتر بر اساس شماره آزمون')}
-                  onChange={onChange}
-                  value={filters.test_number}
-                />
-                <input
-                  name="test_time"
-                  className="form-control search-input"
-                  type="date"
-                  placeholder={t('Filter by Test Date', 'فیلتر بر اساس تاریخ آزمون')}
-                  onChange={onChange}
-                  value={filters.test_time}
-                />
+                <div className="form-floating mb-3">
+                  <select
+                    name="test_number"
+                    className="form-control search-input"
+                    onChange={onChange}
+                    value={filters.test_number}
+                  >
+                    <option value="">{t('All Tests', 'همه آزمون ها')}</option>
+                    <option value="1">{t('Test 1', 'آزمون ۱')}</option>
+                    <option value="2">{t('Test 2', 'آزمون ۲')}</option>
+                    <option value="3">{t('Test 3', 'آزمون ۳')}</option>
+                    <option value="4">{t('Test 4', 'آزمون ۴')}</option>
+                  </select>
+                  <label className="fw-bold">{t('Filter By Test Number', 'فیلتر بر اساس شماره آزمون')}</label>
+                </div>
+                <div className="form-floating mb-3">
+                  <input
+                    id="test_time_filter"
+                    name="test_time"
+                    className="form-control search-input"
+                    type="date"
+                    onChange={onChange}
+                    value={filters.test_time}
+                  />
+                  <label htmlFor="test_time_filter" className="fw-bold">
+                    {t('Filter by Test Date', 'فیلتر بر اساس تاریخ آزمون')}
+                  </label>
+                </div>
                 <button onClick={onReset} className="btn btn-primary px-3">
                   {t('Reset', 'حذف فیلترها')}
                 </button>

@@ -164,22 +164,34 @@ const UserResults = () => {
             {/* Filters */}
             <form className="profile-filters" onSubmit={(e) => e.preventDefault()}>
               <div className="filters-grid">
-                <input
-                  className="form-control"
-                  name="test_number"
-                  type="text"
-                  placeholder={t('Filter by Test Number', 'فیلتر بر اساس شماره آزمون')}
-                  onChange={handleChange}
-                  value={filters.test_number}
-                />
-                <input
-                  className="form-control"
-                  name="test_time"
-                  type="date"
-                  placeholder={t('Filter by Test Date', 'فیلتر بر اساس تاریخ آزمون')}
-                  onChange={handleChange}
-                  value={filters.test_time}
-                />
+                <div className="form-floating mb-3">
+                  <select
+                    className="form-control"
+                    name="test_number"
+                    onChange={handleChange}
+                    value={filters.test_number}
+                  >
+                    <option value="">{t('All Tests', 'همه آزمون ها')}</option>
+                    <option value="1">{t('Test 1', 'آزمون ۱')}</option>
+                    <option value="2">{t('Test 2', 'آزمون ۲')}</option>
+                    <option value="3">{t('Test 3', 'آزمون ۳')}</option>
+                    <option value="4">{t('Test 4', 'آزمون ۴')}</option>
+                  </select>
+                  <label className="fw-bold">{t('Filter by Test Number', 'فیلتر بر اساس شماره آزمون')}</label>
+                </div>
+                <div className="form-floating mb-3">
+                  <input
+                    id="test_time_filter"
+                    className="form-control"
+                    name="test_time"
+                    type="date"
+                    onChange={handleChange}
+                    value={filters.test_time}
+                  />
+                  <label htmlFor="test_time_filter" className="fw-bold">
+                    {t('Filter by Test Date', 'فیلتر بر اساس تاریخ آزمون')}
+                  </label>
+                </div>
                 <select
                   className="form-control"
                   name="username"
