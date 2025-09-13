@@ -11,8 +11,7 @@ import ResetPassword from "./ResetPassword";
 import Profile from "./Profile";
 import Help from "./Help";
 import { useLanguage } from "./LanguageContext";
-
-
+import AdminUserDetail from "./AdminUserDetail";
 
 function App() {
   const [home, setHome] = useState(true);
@@ -40,7 +39,8 @@ function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route path="/password-reset/:token" element={<ResetPassword />} />
-        <Route path="/profile/*" element={<Profile />}/>
+        <Route path="/profile/*" element={<Profile />} />
+        <Route path="/admin/user/:username" element={<AdminUserDetail />} />
         <Route path="/*" element={<p>This page does not exist!</p>} />
       </Routes>
     </div>
