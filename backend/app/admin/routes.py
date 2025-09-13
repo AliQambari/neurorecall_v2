@@ -99,7 +99,11 @@ def api_user_results():
     if filter_approved == 'Yes':
         result = [r for r in result if r['approved'] == 'Yes']
 
-    return jsonify(result)
+    response = jsonify(result)
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 
 @bp.route('/user/<int:user_id>')

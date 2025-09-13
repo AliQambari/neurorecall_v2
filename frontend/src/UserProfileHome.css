@@ -56,7 +56,13 @@
 
 /* Footer */
 .profile .result-card .card-foot { padding: .6rem 1rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
-.profile .card-foot .time { display: inline-flex; gap: .4rem; opacity: .8; }
+.profile .card-foot .time {
+  display: inline-flex;
+  gap: .4rem;
+  opacity: 1;
+  color: #333;
+  font-size: 0.875rem;
+}
 
 /* Logical spacing for RTL/LTR safety */
 .profile [dir="rtl"] .result-card .title-wrap { flex-direction: row-reverse; }

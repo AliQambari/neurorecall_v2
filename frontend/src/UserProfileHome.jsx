@@ -72,14 +72,21 @@ const UserProfileHome = () => {
         const rows = result.scores.map((item) => ({
           ...item,
           id: `${item.test_number}-${item.attempt_number}`,
-          test_time: item.test_time ? new Date(item.test_time).toLocaleString() : ''
+          test_time: item.test_time ? new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'fa-IR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Tehran'
+          }).format(new Date(item.test_time)) : ''
         }));
         setUserData(result.user);
         setData(rows);
       }
     };
     load();
-  }, [filters]);
+  }, [filters, language]);
 
   const onChange = (e) => setFilters((f) => ({ ...f, [e.target.name]: e.target.value }));
   const onReset = () => setFilters({ test_number: '', test_time: '' });
@@ -211,7 +218,7 @@ const UserProfileHome = () => {
 
                           <footer className="card-foot">
                             <span className="time">
-                              <GoClock aria-hidden style={{marginTop: "2px"}}/> 
+                              <GoClock aria-hidden />
                               {row.test_time}
                             </span>
                           </footer>

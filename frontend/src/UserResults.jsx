@@ -63,6 +63,7 @@ const UserResults = () => {
   const [data, setData] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
   const [approvedOnly, setApprovedOnly] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // fetch admin info
   useEffect(() => {
@@ -80,6 +81,8 @@ const UserResults = () => {
 
   // fetch and group user results
   const fetchData = useCallback(async () => {
+    setLoading(true);
+    setData([]);
     try {
       let testTime = filters.test_time;
       if (testTime) {
@@ -90,13 +93,22 @@ const UserResults = () => {
         formattedFilters.approved = 'Yes';
       }
       const query = new URLSearchParams(formattedFilters).toString();
-      const response = await fetch(`/api/admin/user-results?${query}`);
+      const response = await fetch(`/api/admin/user-results?${query}`, {
+        cache: 'no-cache'
+      });
       if (response.ok) {
         const result = await response.json();
         const rows = result.map((item) => ({
           ...item,
           id: `${item.username}-${item.test_number}-${item.attempt_number}`,
-          test_time: item.test_time ? new Date(item.test_time).toLocaleString() : ''
+          test_time: item.test_time ? new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'fa-IR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Tehran'
+          }).format(new Date(item.test_time)) : ''
         }));
         setData(rows);
         const uniqueUsers = [...new Set(result.map((item) => item.username))];
@@ -104,13 +116,20 @@ const UserResults = () => {
       }
     } catch (err) {
       console.error(language === 'en' ? 'Fetch error:' : 'خطا در واکشی اطلاعات', err);
+      setData([]);
+    } finally {
+      setLoading(false);
     }
   }, [filters, language, approvedOnly]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleChange = (e) => setFilters({ ...filters, [e.target.name]: e.target.value });
-  const handleReset = () => setFilters({ username: "", test_number: "", test_time: "" });
+  const handleReset = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFilters({ username: "", test_number: "", test_time: "" });
+  };
 
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
@@ -172,14 +191,20 @@ const UserResults = () => {
                     <option key={idx} value={username}>{username}</option>
                   ))}
                 </select>
-                <button className="btn btn-primary" onClick={handleReset}>
+                <button type="button" className="btn btn-primary" onClick={handleReset}>
                   {t('Reset', 'حذف فیلترها')}
                 </button>
                 <button
+                  type="button"
                   className={`btn ${approvedOnly ? 'btn-success' : 'btn-outline-success'}`}
-                  onClick={() => setApprovedOnly(prev => !prev)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setApprovedOnly(prev => !prev);
+                  }}
+                  disabled={loading}
                 >
-                  {approvedOnly ? t('Show All', 'نمایش همه') : t('Approved Only', 'فقط تایید شده')}
+                  {loading ? t('Loading...', 'در حال بارگذاری...') : (approvedOnly ? t('Show All', 'نمایش همه') : t('Approved Only', 'فقط تایید شده'))}
                 </button>
               </div>
             </form>
@@ -194,7 +219,7 @@ const UserResults = () => {
                 pagination
                 paginationPerPage={5}
                 paginationRowsPerPageOptions={[5, 10, 15]}
-                noDataComponent={t('There are no records to display', 'هیچ داده ای برای نمایش وجود ندارد.')}
+                noDataComponent={loading ? t('Loading...', 'در حال بارگذاری...') : t('There are no records to display', 'هیچ داده ای برای نمایش وجود ندارد.')}
                 conditionalRowStyles={[
                   {
                     when: (row) => row.approved === 'Yes',
@@ -211,7 +236,9 @@ const UserResults = () => {
               />
             ) : (
               <section aria-label={t('User results', 'نتایج کاربران')}>
-                {data.length === 0 ? (
+                {loading ? (
+                  <p className="text-muted mt-3">{t('Loading...', 'در حال بارگذاری...')}</p>
+                ) : data.length === 0 ? (
                   <p className="text-muted mt-3">{t('There are no records to display', 'هیچ داده ای برای نمایش وجود ندارد.')}</p>
                 ) : (
                   <div className="cards-grid">
@@ -254,7 +281,7 @@ const UserResults = () => {
 
                           <footer className="card-foot">
                             <span className="time">
-                              <GoClock aria-hidden style={{marginTop: "2px"}}/>
+                              <GoClock aria-hidden />
                               {row.test_time}
                             </span>
                           </footer>
