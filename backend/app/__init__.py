@@ -57,8 +57,8 @@ def create_app(config_name=None):
     if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
         with app.app_context():
             with db.engine.connect() as connection:
-                connection.execute(text("PRAGMA journal_mode=WAL"))
-                connection.commit()
+                with connection.begin():
+                    connection.execute(text("PRAGMA journal_mode=WAL"))
     # =======================
     # تنظیمات Login Manager
     # =======================
