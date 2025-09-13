@@ -353,7 +353,38 @@ export default function Test() {
       </div>
 
       {/* Upload & Record Sections */}
-      <div className="row px-3 px-md-5 py-4 gy-4 justify-content-center">
+      <div className="ur-container row px-3 px-md-5 py-4 gy-4 justify-content-center">
+        {/* Record Section */}
+        <div className="col-12 col-lg-5 text-center">
+          <div className="upload">
+            <h5 className="pb-3 pt-1">
+              {language === "en" ? "Record your sound" : "صدای خود را ضبط کنید"}
+            </h5>
+            <div>
+              <img
+                src={"../../../images/mic.png"}
+                className={`mx-auto d-block my-4 ${isRecording ? "startRecordingmod" : "startRecord"}`}
+                alt="record"
+                onClick={() => (isRecording ? stopRecording() : startRecording())}
+              />
+            </div>
+            {recordedBlob && (
+              <p className="text-muted" style={{ fontSize: '12px' }}>
+                {language === "en" ? `Recorded: ${(recordedBlob.size / (1024 * 1024)).toFixed(2)} MB` :
+                  `ضبط شده: ${(recordedBlob.size / (1024 * 1024)).toFixed(2)} مگابایت`}
+              </p>
+            )}
+            <hr className="line mx-auto d-block" />
+            <button
+              className="btn cardBtn mt-3 test-action"
+              onClick={handleRecordSubmit}
+              disabled={loading1 || loading2}
+            >
+              {loading2 ? <PuffLoader size={40} color="#fff" /> : (recordedBlob ? (language === "en" ? "Submit Recording" : "ثبت فایل") : (language === "en" ? "Record" : "ضبط کنید"))}
+            </button>
+          </div>
+        </div>
+
         {/* Upload Section */}
         <div className="col-12 col-lg-5 text-center">
           <div className="upload" {...getRootProps()}>
@@ -397,37 +428,6 @@ export default function Test() {
               disabled={loading1 || loading2}
             >
               {loading1 ? <PuffLoader size={40} color="#fff" /> : (uploadedFile ? (language === "en" ? "Submit Upload" : "ثبت فایل") : (language === "en" ? "Upload a File" : "یک فایل آپلود کنید"))}
-            </button>
-          </div>
-        </div>
-
-        {/* Record Section */}
-        <div className="col-12 col-lg-5 text-center">
-          <div className="upload">
-            <h5 className="pb-3 pt-1">
-              {language === "en" ? "Record your sound" : "صدای خود را ضبط کنید"}
-            </h5>
-            <div>
-              <img
-                src={"../../../images/mic.png"}
-                className={`mx-auto d-block my-4 ${isRecording ? "startRecordingmod" : "startRecord"}`}
-                alt="record"
-                onClick={() => (isRecording ? stopRecording() : startRecording())}
-              />
-            </div>
-            {recordedBlob && (
-              <p className="text-muted" style={{ fontSize: '12px' }}>
-                {language === "en" ? `Recorded: ${(recordedBlob.size / (1024 * 1024)).toFixed(2)} MB` :
-                  `ضبط شده: ${(recordedBlob.size / (1024 * 1024)).toFixed(2)} مگابایت`}
-              </p>
-            )}
-            <hr className="line mx-auto d-block" />
-            <button
-              className="btn cardBtn mt-3 test-action"
-              onClick={handleRecordSubmit}
-              disabled={loading1 || loading2}
-            >
-              {loading2 ? <PuffLoader size={40} color="#fff" /> : (recordedBlob ? (language === "en" ? "Submit Recording" : "ثبت فایل") : (language === "en" ? "Record" : "ضبط کنید"))}
             </button>
           </div>
         </div>

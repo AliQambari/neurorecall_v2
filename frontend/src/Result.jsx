@@ -30,6 +30,10 @@ export default function Result() {
     console.log(t, r);
   }, []);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [])
+
   if (!state) {
     return <p>
       {language === "en" ? "Error: no result data" : "خطا: داده ای برای نتایج یافت نشد."}
@@ -53,7 +57,7 @@ export default function Result() {
                    `نتیجه تست ${testNum} دور ${roundNum}`}
                 </h3>
                 {!round_completed ?
-                <h6 className={`text-muted pb-2 ${language === "en" ? "lh-md" : "lh-lg"}`} style={{whiteSpace: "pre-line"}}>
+                <h6 className={`text-muted pb-2 mx-3 ${language === "en" ? "lh-md" : "lh-lg"}`} style={{whiteSpace: "pre-line"}}>
                   {language === "en" ? 
                     `You have finished this round. 
                     \nClick "Next Round" to begin round ${roundNum + 1}` 
@@ -61,7 +65,7 @@ export default function Result() {
                     روی گزینه «دور بعدی» کلیک کنید تا دور  ${roundNum + 1} ام آغاز شود.`
                   }
                 </h6> : 
-                <h6 className={`text-muted pb-2 ${language === "en" ? "lh-md" : "lh-lg"}`} style={{whiteSpace: "pre-line"}}>
+                <h6 className={`text-muted pb-2 mx-3 ${language === "en" ? "lh-md" : "lh-lg"}`} style={{whiteSpace: "pre-line"}}>
                   {language === "en" ? 
                     `‌You have finished test ${testNum}. You can see the results in your profile page.` 
                     : `شما این آزمون را به اتمام رساندید.
@@ -69,29 +73,6 @@ export default function Result() {
                   }
                 </h6> 
                 }
-                {/* <h4 className="text-muted pb-4">
-                  {language === "en" ? "You have scored:" : "امتیاز به دست آمده:"}
-                </h4>
-                <h5>{language === "en" ? `${correct_words} / 16` : `16 / ${correct_words}`}</h5>
-                <DonutChart
-                  data={[
-                    {
-                      label: "",
-                      value: percent,
-                    },
-                    {
-                      label: "",
-                      value: 100 - percent,
-                    },
-                  ]}
-                  height={150}
-                  width={150}
-                  colors={["#8ec2f2", "#f9f9f9"]}
-                  emptyColor="#ded6d6"
-                  legend={false}
-                  strokeColor="#8ec2f2"
-                  interactive={false}
-                /> */}
               </div>
               <div className="d-flex justify-content-center gap-3">
                 <button

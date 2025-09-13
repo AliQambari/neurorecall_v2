@@ -12,6 +12,11 @@
   color: var(--accent-color);
 }
 
+/* Upload & record container */
+.testRound > * {
+  margin-left: 0; margin-right: 0;
+}
+
 /* Upload box */
 .upload {
   background-color: var(--white);
