@@ -15,6 +15,7 @@ import {
   LuLogOut,
 } from "react-icons/lu";
 import { GoHome } from "react-icons/go";
+import NotificationBell from "./NotificationBell";
 
 
 export default function Navbar() {
@@ -193,6 +194,13 @@ export default function Navbar() {
             </ul>
 
             <ul className="navbar-nav mb-2 mb-lg-0">
+              {isAdmin && (
+                <li className="nav-item d-flex align-items-center">
+                  <div className={linkClass}>
+                    <NotificationBell />
+                  </div>
+                </li>
+              )}
               <li className="nav-item">
                 <button
                   className="nav-link btn btn-primary px-4 navbarBtn"

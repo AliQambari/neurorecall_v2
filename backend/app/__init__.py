@@ -52,6 +52,11 @@ def create_app(config_name=None):
     mail.init_app(app)
     migrate.init_app(app, db)
 
+    # Enable WAL mode for better SQLite concurrency
+    if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
+        with app.app_context():
+            db.engine.execute("PRAGMA journal_mode=WAL")
+
     # =======================
     # تنظیمات Login Manager
     # =======================

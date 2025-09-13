@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from app.models.user import User
 from app.models.score import Score
+from app.models.notification import Notification
 from . import bp  # admin blueprint
 from functools import wraps
 
@@ -200,3 +201,70 @@ def api_user_results_detail(username):
     result.sort(key=lambda r: (r['test_number'], r['attempt_number']))
 
     return jsonify(result)
+
+
+@bp.route('/notifications', methods=['GET'])
+@login_required
+@admin_required
+def get_notifications():
+    """
+    Returns recent notifications for admin.
+    Optional query parameters:
+    - limit: number of notifications to return (default: 10)
+    - unread_only: if 'true', only return unread notifications
+    """
+    from app import db
+    
+    limit = request.args.get('limit', 10, type=int)
+    unread_only = request.args.get('unread_only', 'false').lower() == 'true'
+    
+    query = Notification.query.join(User, Notification.user_id == User.id)
+    
+    if unread_only:
+        query = query.filter(Notification.is_read == False)
+    
+    notifications = query.order_by(Notification.created_at.desc()).limit(limit).all()
+    
+    return jsonify([notification.to_dict() for notification in notifications])
+
+
+@bp.route('/notifications/<int:notification_id>/mark-read', methods=['POST'])
+@login_required
+@admin_required
+def mark_notification_read(notification_id):
+    """
+    Mark a specific notification as read.
+    """
+    from app import db
+    
+    notification = Notification.query.get_or_404(notification_id)
+    notification.is_read = True
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Notification marked as read'})
+
+
+@bp.route('/notifications/mark-all-read', methods=['POST'])
+@login_required
+@admin_required
+def mark_all_notifications_read():
+    """
+    Mark all notifications as read.
+    """
+    from app import db
+    
+    Notification.query.filter(Notification.is_read == False).update({'is_read': True})
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'All notifications marked as read'})
+
+
+@bp.route('/notifications/count', methods=['GET'])
+@login_required
+@admin_required
+def get_unread_notifications_count():
+    """
+    Returns the count of unread notifications.
+    """
+    count = Notification.query.filter(Notification.is_read == False).count()
+    return jsonify({'count': count})

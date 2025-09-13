@@ -3,6 +3,7 @@ from flask import request, jsonify
 from flask_login import current_user, login_required
 from datetime import datetime
 from app.models.score import Score
+from app.models.notification import Notification
 from app.tests.utils import save_and_keep_original, recognize_audio, calculate_score, allowed_upload
 from app.tests import bp
 from app import db
@@ -102,6 +103,18 @@ def submit_audio():
                 test_time=datetime.now()
             )
             db.session.add(score_entry)
+
+        # Create notification when test is completed (round 5)
+        if round_number == 5:
+            # Create bilingual notification message
+            notification_message = f"🎯 {current_user.username} completed Test {test_number} (Attempt {attempt_number}) | کاربر {current_user.username} آزمون {test_number} را تکمیل کرد (تلاش {attempt_number})"
+            notification = Notification(
+                user_id=user_id,
+                test_number=test_number,
+                attempt_number=attempt_number,
+                message=notification_message
+            )
+            db.session.add(notification)
 
         db.session.commit()
 

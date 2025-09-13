@@ -18,6 +18,7 @@ class Config:
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
+        'connect_args': {'check_same_thread': False}
     }
     
     # Session security
@@ -153,6 +154,7 @@ class ProductionConfig(Config):
         'pool_size': 10,
         'max_overflow': 20,
         'pool_timeout': 30,
+        'connect_args': {'check_same_thread': False}
     }
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'Strict'
