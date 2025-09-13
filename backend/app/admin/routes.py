@@ -48,7 +48,7 @@ def api_user_results():
     if filter_test_time:
         try:
             test_time_dt = datetime.fromisoformat(filter_test_time)
-            test_time_end = test_time_dt + timedelta(minutes=1)
+            test_time_end = test_time_dt + timedelta(days=1)
             scores_query = scores_query.filter(
                 Score.test_time >= test_time_dt,
                 Score.test_time < test_time_end
@@ -92,6 +92,11 @@ def api_user_results():
 
     # sort results
     result.sort(key=lambda r: (r['username'], r['test_number'], r['attempt_number']))
+
+    # Apply approved filter if requested
+    filter_approved = request.args.get('approved')
+    if filter_approved == 'Yes':
+        result = [r for r in result if r['approved'] == 'Yes']
 
     return jsonify(result)
 

@@ -61,6 +61,7 @@ const UserResults = () => {
   const [filters, setFilters] = useState({ username: "", test_number: "", test_time: "" });
   const [data, setData] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
+  const [approvedOnly, setApprovedOnly] = useState(false);
 
   // fetch admin info
   useEffect(() => {
@@ -80,8 +81,13 @@ const UserResults = () => {
   const fetchData = useCallback(async () => {
     try {
       let testTime = filters.test_time;
-      if (testTime && !testTime.includes('seconds')) testTime = testTime + ':00';
+      if (testTime) {
+        testTime = `${testTime}T00:00`;
+      }
       const formattedFilters = { ...filters, test_time: testTime || '' };
+      if (approvedOnly) {
+        formattedFilters.approved = 'Yes';
+      }
       const query = new URLSearchParams(formattedFilters).toString();
       const response = await fetch(`/api/admin/user-results?${query}`);
       if (response.ok) {
@@ -98,7 +104,7 @@ const UserResults = () => {
     } catch (err) {
       console.error(language === 'en' ? 'Fetch error:' : 'خطا در واکشی اطلاعات', err);
     }
-  }, [filters, language]);
+  }, [filters, language, approvedOnly]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -149,7 +155,8 @@ const UserResults = () => {
                 <input
                   className="form-control"
                   name="test_time"
-                  type="datetime-local"
+                  type="date"
+                  placeholder={t('Filter by Test Date', 'فیلتر بر اساس تاریخ آزمون')}
                   onChange={handleChange}
                   value={filters.test_time}
                 />
@@ -167,6 +174,12 @@ const UserResults = () => {
                 <button className="btn btn-primary" onClick={handleReset}>
                   {t('Reset', 'حذف فیلترها')}
                 </button>
+                <button
+                  className={`btn ${approvedOnly ? 'btn-success' : 'btn-outline-success'}`}
+                  onClick={() => setApprovedOnly(prev => !prev)}
+                >
+                  {approvedOnly ? t('Show All', 'نمایش همه') : t('Approved Only', 'فقط تایید شده')}
+                </button>
               </div>
             </form>
 
@@ -181,6 +194,14 @@ const UserResults = () => {
                 paginationPerPage={5}
                 paginationRowsPerPageOptions={[5, 10, 15]}
                 noDataComponent={t('There are no records to display', 'هیچ داده ای برای نمایش وجود ندارد.')}
+                conditionalRowStyles={[
+                  {
+                    when: (row) => row.approved === 'Yes',
+                    style: {
+                      backgroundColor: '#d4edda',
+                    },
+                  },
+                ]}
                 customStyles={{
                   table: { style: { padding: '20px 40px' } },
                   headCells: { style: { paddingLeft: '8px', paddingRight: '8px' } },
@@ -198,7 +219,7 @@ const UserResults = () => {
                       const rounds = [1, 2, 3, 4, 5].map((n) => ({ n, v: row[`round${n}`] ?? '—' }));
                       const gLabel = row.gender === 'female' ? t('female', 'زن') : t('male', 'مرد');
                       return (
-                        <article key={`${row.username}-${row.test_number}`} className="result-card" aria-label={t('Result card', 'کارت نتیجه')}>
+                        <article key={`${row.username}-${row.test_number}`} className={`result-card ${approved ? 'approved' : ''}`} aria-label={t('Result card', 'کارت نتیجه')}>
                           <header className="card-head">
                             <div className="title-wrap">
                               <span className="hash"><GoHash aria-hidden /></span>

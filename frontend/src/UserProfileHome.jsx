@@ -132,7 +132,8 @@ const UserProfileHome = () => {
                 <input
                   name="test_time"
                   className="form-control search-input"
-                  type="datetime-local"
+                  type="date"
+                  placeholder={t('Filter by Test Date', 'فیلتر بر اساس تاریخ آزمون')}
                   onChange={onChange}
                   value={filters.test_time}
                 />

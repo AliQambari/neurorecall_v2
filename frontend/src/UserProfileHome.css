@@ -66,3 +66,7 @@
 @media (max-width: 991.98px) {
   .profile .sidebar { order: -1; }
 }
+
+.profile .result-card.approved {
+  background-color: #d4edda;
+}

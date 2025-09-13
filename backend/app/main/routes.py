@@ -39,7 +39,7 @@ def api_user_profile():
     if f_time:
         try:
             dt = datetime.fromisoformat(f_time)
-            dt_end = dt + timedelta(minutes=1)
+            dt_end = dt + timedelta(days=1)
             q = q.filter(Score.test_time >= dt, Score.test_time < dt_end)
         except ValueError:
             return jsonify({'error': 'Bad date'}), 400
