@@ -6,6 +6,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_cors import CORS
 from config import get_config
+from sqlalchemy import text
 
 # =======================
 # ایجاد نمونه اکستنشن‌ها
@@ -55,8 +56,9 @@ def create_app(config_name=None):
     # Enable WAL mode for better SQLite concurrency
     if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
         with app.app_context():
-            db.engine.execute("PRAGMA journal_mode=WAL")
-
+            with db.engine.connect() as connection:
+                connection.execute(text("PRAGMA journal_mode=WAL"))
+                connection.commit()
     # =======================
     # تنظیمات Login Manager
     # =======================
