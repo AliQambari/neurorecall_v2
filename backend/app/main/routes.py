@@ -76,8 +76,9 @@ def api_user_profile():
         }
         rows.append(row)
 
-    # sort rows by test_number then attempt_number desc (latest first)
-    rows.sort(key=lambda r: (r['test_number'], r['attempt_number']))
+    from datetime import datetime
+    # sort rows latest to oldest by test_time
+    rows.sort(key=lambda r: (datetime.fromisoformat(r['test_time']) if r['test_time'] else datetime.min, r['test_number'], r['attempt_number']), reverse=True)
 
     return jsonify({
         "user": {

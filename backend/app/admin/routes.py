@@ -91,8 +91,9 @@ def api_user_results():
         }
         result.append(row)
 
-    # sort results
-    result.sort(key=lambda r: (r['username'], r['test_number'], r['attempt_number']))
+    from datetime import datetime
+    # sort results latest to oldest by test_time
+    result.sort(key=lambda r: (datetime.fromisoformat(r['test_time']) if r['test_time'] else datetime.min, r['username'], r['test_number'], r['attempt_number']), reverse=True)
 
     # Apply approved filter if requested
     filter_approved = request.args.get('approved')
