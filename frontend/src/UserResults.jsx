@@ -56,6 +56,7 @@ const UserResults = () => {
     { name: t('Test Time', 'تاریخ آزمون'), selector: (row) => row.test_time, sortable: false, width: '230px', id: 'test_time' },
     { name: t('Approved', 'تایید شده'), selector: (row) => (row.approved === 'Yes' ? t('Yes', 'بله') : t('No', 'خیر')), sortable: true, width: '130px' },
     { name: t('Total Score', 'مجموع امتیاز'), selector: (row) => row.total_score, sortable: true, width: '140px' },
+
   ];
 
   const [adminInfo, setAdminInfo] = useState({ username: '', profile_photo: '' });
@@ -64,6 +65,8 @@ const UserResults = () => {
   const [userOptions, setUserOptions] = useState([]);
   const [approvedOnly, setApprovedOnly] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   // fetch admin info
   useEffect(() => {
@@ -146,6 +149,16 @@ const UserResults = () => {
     }
   };
 
+  const handleViewWords = (row) => {
+    setSelectedRow(row);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedRow(null);
+  };
+
   return (
     <div className="container-fluid profile" dir={dir}>
       <div className="row">
@@ -223,6 +236,7 @@ const UserResults = () => {
 
             {/* Desktop: DataTable; Mobile/Tablet: Cards */}
             {isDesktop ? (
+              <>
               <DataTable
                 className="tableCustom"
                 columns={columns}
@@ -248,6 +262,9 @@ const UserResults = () => {
                   cells: { style: { paddingLeft: '18px', paddingRight: '8px' } },
                 }}
               />
+
+              {/* Removed modal here; moved to AdminUserDetail */}
+              </>
             ) : (
               <section aria-label={t('User results', 'نتایج کاربران')}>
                 {loading ? (
@@ -272,6 +289,7 @@ const UserResults = () => {
                                 {approved ? (<><GoCheckCircle aria-hidden /> {t('Approved', 'تایید شده')}</>) : (<><GoXCircle aria-hidden /> {t('Not approved', 'تایید نشده')}</>)}
                               </span>
                               <span className="chip chip-score" title={t('Total Score', 'مجموع امتیاز')}><GoTrophy aria-hidden className="me-1" /> {row.total_score}</span>
+
                             </div>
                           </header>
 
@@ -312,5 +330,6 @@ const UserResults = () => {
     </div>
   );
 };
+
 
 export default UserResults;

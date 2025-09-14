@@ -84,7 +84,7 @@ def api_user_results():
         row = {
             'username': user.username,
             'age': user.age,
-            'sex': user.sex,
+            'gender': user.sex,
             'test_number': test_number,
             'attempt_number': attempt_number,
             'round1': next((it.score for it in items_sorted if it.round_number == 1), None),
@@ -96,6 +96,35 @@ def api_user_results():
             'approved': 'Yes' if approved else 'No',
             'total_score': total_score,
         }
+        if approved:
+            all_correct = []
+            all_incorrect = []
+            rounds_detail = []
+            # Build aggregate lists and per-round details
+            from collections import Counter
+            for item in items_sorted:
+                cw = item.correct_words or []
+                iw = item.incorrect_words or []
+                all_correct.extend(cw)
+                all_incorrect.extend(iw)
+                # Duplicates within this round
+                cd = [word for word, count in Counter(cw).items() if count > 1]
+                idup = [word for word, count in Counter(iw).items() if count > 1]
+                rounds_detail.append({
+                    'round': item.round_number,
+                    'correct_words': cw,
+                    'incorrect_words': iw,
+                    'correct_duplicates': cd,
+                    'incorrect_duplicates': idup,
+                })
+            # Duplicates across the whole attempt (aggregate)
+            correct_duplicates = [word for word, count in Counter(all_correct).items() if count > 1]
+            incorrect_duplicates = [word for word, count in Counter(all_incorrect).items() if count > 1]
+            row['correct_words'] = all_correct
+            row['incorrect_words'] = all_incorrect
+            row['correct_duplicates'] = correct_duplicates
+            row['incorrect_duplicates'] = incorrect_duplicates
+            row['rounds_detail'] = rounds_detail
         result.append(row)
 
     # sort results latest to oldest
@@ -217,6 +246,30 @@ def api_user_results_detail(username):
             'approved': 'Yes',
             'total_score': total_score,
         }
+        # Add per-round details and aggregate duplicates
+        from collections import Counter
+        all_correct = []
+        all_incorrect = []
+        rounds_detail = []
+        for item in items_sorted:
+            cw = item.correct_words or []
+            iw = item.incorrect_words or []
+            all_correct.extend(cw)
+            all_incorrect.extend(iw)
+            cd = [w for w, c in Counter(cw).items() if c > 1]
+            idup = [w for w, c in Counter(iw).items() if c > 1]
+            rounds_detail.append({
+                'round': item.round_number,
+                'correct_words': cw,
+                'incorrect_words': iw,
+                'correct_duplicates': cd,
+                'incorrect_duplicates': idup,
+            })
+        row['correct_words'] = all_correct
+        row['incorrect_words'] = all_incorrect
+        row['correct_duplicates'] = [w for w, c in Counter(all_correct).items() if c > 1]
+        row['incorrect_duplicates'] = [w for w, c in Counter(all_incorrect).items() if c > 1]
+        row['rounds_detail'] = rounds_detail
         result.append(row)
 
     # sort by test_number, attempt_number

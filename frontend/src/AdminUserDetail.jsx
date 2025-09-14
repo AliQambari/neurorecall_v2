@@ -55,12 +55,26 @@ const AdminUserDetail = () => {
     { name: t('Round 5 Score', 'امتیاز دور ۵'), selector: (row) => row.round5 ?? '-', sortable: true, width: '130px' },
     { name: t('Test Time', 'تاریخ آزمون'), selector: (row) => row.test_time, sortable: true, width: '230px' },
     { name: t('Total Score', 'مجموع امتیاز'), selector: (row) => row.total_score, sortable: true, width: '140px' },
+    {
+      name: t('View Details', 'جزئیات'),
+      cell: (row) => (
+        <button className="btn btn-sm btn-info" onClick={() => { setSelectedRow(row); setShowModal(true); }}>
+          {t('View', 'مشاهده')}
+        </button>
+      ),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+      width: '120px'
+    },
   ];
 
   const [adminInfo, setAdminInfo] = useState({ username: '', profile_photo: '' });
   const [filters, setFilters] = useState({ test_number: "", test_time: "" });
   const [data, setData] = useState([]);
   const [userInfo, setUserInfo] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   // fetch admin info
   useEffect(() => {
@@ -291,6 +305,113 @@ const AdminUserDetail = () => {
                   </div>
                 )}
               </section>
+            )}
+
+            {showModal && selectedRow && (
+              <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex="-1" role="dialog" aria-modal>
+                <div className="modal-dialog modal-xl">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title">
+                        {t('Test Details', 'جزئیات آزمون')} {selectedRow.test_number}.{selectedRow.attempt_number}
+                      </h5>
+                      <button type="button" className="btn-close" aria-label={t('Close', 'بستن')} onClick={() => { setShowModal(false); setSelectedRow(null); }}></button>
+                    </div>
+                    <div className="modal-body">
+                      {selectedRow.rounds_detail && selectedRow.rounds_detail.length > 0 ? (
+                        <div className="accordion" id="roundsAccordion">
+                          {selectedRow.rounds_detail.map((rd, idx) => (
+                            <div className="accordion-item" key={idx}>
+                              <h2 className="accordion-header" id={`heading-${idx}`}>
+                                <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse-${idx}`} aria-expanded={idx === 0} aria-controls={`collapse-${idx}`}>
+                                  {t('Round', 'دور')} {rd.round}
+                                </button>
+                              </h2>
+                              <div id={`collapse-${idx}`} className={`accordion-collapse collapse ${idx === 0 ? 'show' : ''}`} aria-labelledby={`heading-${idx}`} data-bs-parent="#roundsAccordion">
+                                <div className="accordion-body">
+                                  <div className="row g-3">
+                                    <div className="col-12 col-md-6">
+                                      <div className="card h-100">
+                                        <div className="card-header fw-bold">{t('Correct Words', 'کلمات درست')}</div>
+                                        <div className="card-body p-2" style={{ maxHeight: 220, overflowY: 'auto' }}>
+                                          {rd.correct_words && rd.correct_words.length ? (
+                                            <ul className="list-group list-group-flush small">
+                                              {rd.correct_words.map((word, i) => (
+                                                <li key={i} className="list-group-item">{word}</li>
+                                              ))}
+                                            </ul>
+                                          ) : (
+                                            <div className="text-muted small">{t('None', 'هیچ')}</div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="col-12 col-md-6">
+                                      <div className="card h-100">
+                                        <div className="card-header fw-bold">{t('Incorrect Words', 'کلمات نادرست')}</div>
+                                        <div className="card-body p-2" style={{ maxHeight: 220, overflowY: 'auto' }}>
+                                          {rd.incorrect_words && rd.incorrect_words.length ? (
+                                            <ul className="list-group list-group-flush small">
+                                              {rd.incorrect_words.map((word, i) => (
+                                                <li key={i} className="list-group-item">{word}</li>
+                                              ))}
+                                            </ul>
+                                          ) : (
+                                            <div className="text-muted small">{t('None', 'هیچ')}</div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="col-12 col-md-6">
+                                      <div className="card h-100 border-success">
+                                        <div className="card-header fw-bold text-success">{t('Duplicate Correct', 'تکراری درست')}</div>
+                                        <div className="card-body p-2" style={{ maxHeight: 160, overflowY: 'auto' }}>
+                                          {rd.correct_duplicates && rd.correct_duplicates.length ? (
+                                            <ul className="list-group list-group-flush small">
+                                              {rd.correct_duplicates.map((word, i) => (
+                                                <li key={i} className="list-group-item">{word}</li>
+                                              ))}
+                                            </ul>
+                                          ) : (
+                                            <div className="text-muted small">{t('No duplicates', 'بدون تکراری')}</div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="col-12 col-md-6">
+                                      <div className="card h-100 border-danger">
+                                        <div className="card-header fw-bold text-danger">{t('Duplicate Incorrect', 'تکراری نادرست')}</div>
+                                        <div className="card-body p-2" style={{ maxHeight: 160, overflowY: 'auto' }}>
+                                          {rd.incorrect_duplicates && rd.incorrect_duplicates.length ? (
+                                            <ul className="list-group list-group-flush small">
+                                              {rd.incorrect_duplicates.map((word, i) => (
+                                                <li key={i} className="list-group-item">{word}</li>
+                                              ))}
+                                            </ul>
+                                          ) : (
+                                            <div className="text-muted small">{t('No duplicates', 'بدون تکراری')}</div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="alert alert-info small mb-0">{t('No words available for this attempt.', 'کلماتی برای این تلاش موجود نیست.')}</div>
+                      )}
+                    </div>
+                    <div className="modal-footer">
+                      <button type="button" className="btn btn-secondary" onClick={() => { setShowModal(false); setSelectedRow(null); }}>
+                        {t('Close', 'بستن')}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
