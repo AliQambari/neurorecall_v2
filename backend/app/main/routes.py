@@ -14,6 +14,7 @@ def index():
 from flask import jsonify, request, session
 from flask_login import login_required, current_user
 import datetime
+from datetime import timedelta
 import pytz
 
 
@@ -42,7 +43,8 @@ def api_user_profile():
             # Parse frontend date as Tehran local midnight
             tehran_tz = pytz.timezone('Asia/Tehran')
             date_str = f_time.split('T')[0]  # Extract YYYY-MM-DD
-            local_dt = datetime.strptime(date_str, '%Y-%m-%d').replace(tzinfo=tehran_tz)
+            # Use datetime.datetime to avoid shadowing issues
+            local_dt = datetime.datetime.strptime(date_str, '%Y-%m-%d').replace(tzinfo=tehran_tz)
             # Convert to UTC for DB comparison
             start_utc = local_dt.astimezone(pytz.UTC)
             end_utc = start_utc + timedelta(days=1)
@@ -82,9 +84,8 @@ def api_user_profile():
         }
         rows.append(row)
 
-    from datetime import datetime
     # sort rows latest to oldest by test_time
-    rows.sort(key=lambda r: (datetime.fromisoformat(r['test_time']) if r['test_time'] else datetime.min, r['test_number'], r['attempt_number']), reverse=True)
+    rows.sort(key=lambda r: (datetime.datetime.fromisoformat(r['test_time']) if r['test_time'] else datetime.datetime.min, r['test_number'], r['attempt_number']), reverse=True)
 
     return jsonify({
         "user": {

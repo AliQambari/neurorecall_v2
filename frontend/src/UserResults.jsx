@@ -304,11 +304,14 @@ const UserResults = () => {
                             </ul>
                           </div>
 
-                          <footer className="card-foot">
+                          <footer className="card-foot d-flex justify-content-between align-items-center">
                             <span className="time">
                               <GoClock aria-hidden />
                               {row.test_time}
                             </span>
+                            <Link to={`/admin/user/${row.username}`} className="btn btn-outline-primary btn-sm">
+                              {t('View details', 'نمایش جزئیات')}
+                            </Link>
                           </footer>
                         </article>
                       );
