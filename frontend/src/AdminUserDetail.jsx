@@ -149,7 +149,7 @@ const AdminUserDetail = () => {
         <div className="col-12 col-lg-1 sidebar px-0 pt-5 pb-5 d-flex flex-column align-items-center">
           <ProfileImageUpload
             onChange={handlePhotoChange}
-            source={adminInfo.profile_photo ? `${BASE_URL}/static/profile_photos/${adminInfo.profile_photo}` : "/images/profile.png"}
+            source={adminInfo.profile_photo ? `/static/profile_photos/${adminInfo.profile_photo}` : "/images/profile.png"}
           />
           <h5 className="text-center mt-3 mb-0">{t('admin', 'مدیر')}</h5>
         </div>

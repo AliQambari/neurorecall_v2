@@ -119,7 +119,7 @@ const UserProfileHome = () => {
           <ProfileImageUpload
             onChange={handlePhotoChange}
             source={userData.profile_photo
-              ? `${BASE_URL}/static/profile_photos/${userData.profile_photo}`
+              ? `/static/profile_photos/${userData.profile_photo}`
               : "../images/profile.png"}
           />
           <h5 className="text-center mt-3 mb-0">{userData.username ? userData.username : ""}</h5>
