@@ -32,12 +32,18 @@ export default function Home() {
             <a
               className={`btn btn-primary px-4 navbarBtn mt-3`}
               aria-current="page"
+              href="/profile/tests"
+            >
+              {language === "en" ? "Go to Tests →" : "رفتن به آزمون‌ها →"}
+            </a>
+          ) : (
+            <a
+              className={`btn btn-primary px-4 navbarBtn mt-3`}
+              aria-current="page"
               href="/register"
             >
               {language === "en" ? "Register →" : "ثبت نام →"}
             </a>
-          ) : (
-            <br />
           )}
         </div>
       </div>

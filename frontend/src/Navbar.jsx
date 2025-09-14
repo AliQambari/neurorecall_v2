@@ -203,7 +203,7 @@ export default function Navbar() {
               )}
               <li className="nav-item">
                 <button
-                  className="nav-link btn btn-primary px-4 navbarBtn"
+                  className="nav-link btn btn-primary px-4 navbarBtn logoutBtn"
                   onClick={logoutHandler}
                 >
                   {language === "en" ? `Logout ` : "خروج"}

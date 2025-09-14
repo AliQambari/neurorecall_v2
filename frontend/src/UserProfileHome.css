@@ -6,6 +6,29 @@
 }
 @media (min-width: 768px) { .profile .filters-grid { grid-template-columns: 1fr 1fr 1fr auto; } }
 
+/* Normalize filter control heights */
+.profile .filters-grid { align-items: start; }
+.profile .filters-grid .form-floating > .form-control,
+.profile .filters-grid .form-floating > .form-select {
+  height: calc(3.5rem + 2px);
+  line-height: 1.25;
+  padding-top: 1.25rem; /* space for floating label */
+}
+.profile .filters-grid .form-floating > label {
+  padding: .5rem .75rem;
+}
+/* Non-floating controls */
+.profile .filters-grid .form-control,
+.profile .filters-grid .form-select {
+  height: calc(3.5rem + 2px);
+}
+/* Buttons match input height */
+.profile .filters-grid .btn {
+  height: calc(3.5rem + 2px);
+  display: inline-flex;
+  align-items: center;
+}
+
 /* Card grid */
 .profile .cards-grid {
   display: grid;

@@ -13,7 +13,7 @@ import {
 import { LuUser } from "react-icons/lu";
 import "./UserProfileHome.css";
 
-const BASE_URL = process.env.REACT_APP_API_URL;
+
 
 function useIsDesktop(breakpoint = 992) {
   const query = `(min-width: ${breakpoint}px)`;
@@ -65,8 +65,6 @@ const UserResults = () => {
   const [userOptions, setUserOptions] = useState([]);
   const [approvedOnly, setApprovedOnly] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
 
   // fetch admin info
   useEffect(() => {
@@ -149,15 +147,7 @@ const UserResults = () => {
     }
   };
 
-  const handleViewWords = (row) => {
-    setSelectedRow(row);
-    setShowModal(true);
-  };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedRow(null);
-  };
 
   return (
     <div className="container-fluid profile" dir={dir}>
@@ -172,7 +162,10 @@ const UserResults = () => {
 
         <div className="col-12 col-lg-11 py-5 px-3 px-lg-5">
           <div className="px-0 px-md-2 py-3 py-md-5">
-            <h3 className="mb-4 mb-md-5">{t('User Results', 'نتایج کاربران')}</h3>
+            <h3 className="mb-3">{t('User Results', 'نتایج کاربران')}</h3>
+            <div className="alert alert-info py-2" role="alert">
+              {t('Tip: Click a username to view their progress and detailed results.', 'نکته: برای مشاهده روند پیشرفت و جزئیات نتایج هر کاربر روی نام کاربری او کلیک کنید.')}
+            </div>
 
             {/* Filters */}
             <form className="profile-filters" onSubmit={(e) => e.preventDefault()}>

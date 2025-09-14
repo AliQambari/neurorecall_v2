@@ -54,6 +54,13 @@
   color: #8ec2f2 !important;
 }
 
+/* Logout specific hover: turn red on hover */
+.logoutBtn:hover {
+  background-color: #dc3545; /* bootstrap danger red */
+  color: #fff !important;
+  border-color: #dc3545;
+}
+
 /* List & item spacing */
 .nav-ul {
   padding-right: 0;

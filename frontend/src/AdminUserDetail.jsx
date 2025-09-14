@@ -5,16 +5,15 @@ import { useLanguage } from './LanguageContext';
 import ProfileImageUpload from "./ProfileImageUpload";
 import {
   GoCheckCircle,
-  GoXCircle,
   GoClock,
   GoHash,
   GoTrophy,
 } from "react-icons/go";
-import { LuUser } from "react-icons/lu";
+
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import "./UserProfileHome.css";
 
-const BASE_URL = process.env.REACT_APP_API_URL;
+
 
 function useIsDesktop(breakpoint = 992) {
   const query = `(min-width: ${breakpoint}px)`;
@@ -72,7 +71,6 @@ const AdminUserDetail = () => {
   const [adminInfo, setAdminInfo] = useState({ username: '', profile_photo: '' });
   const [filters, setFilters] = useState({ test_number: "", test_time: "" });
   const [data, setData] = useState([]);
-  const [userInfo, setUserInfo] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -90,16 +88,7 @@ const AdminUserDetail = () => {
     fetchAdminInfo();
   }, [language]);
 
-  // fetch user info from results or separate endpoint
-  useEffect(() => {
-    if (data.length > 0) {
-      setUserInfo({
-        username: data[0].username,
-        age: data[0].age,
-        gender: data[0].gender
-      });
-    }
-  }, [data]);
+  // fetch user info from results or separate endpoint (removed: unused)
 
   // fetch and group user results
   const fetchData = useCallback(async () => {
@@ -291,6 +280,15 @@ const AdminUserDetail = () => {
                                 </li>
                               ))}
                             </ul>
+                            <div className="text-end mt-2">
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-info"
+                                onClick={() => { setSelectedRow(row); setShowModal(true); }}
+                              >
+                                {t('View Details', 'جزئیات')}
+                              </button>
+                            </div>
                           </div>
 
                           <footer className="card-foot">
