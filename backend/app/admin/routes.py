@@ -1,7 +1,9 @@
 # admin/routes.py
 from flask import jsonify, request
 from flask_login import login_required, current_user
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
+import pytz
 from app.models.user import User
 from app.models.score import Score
 from app.models.notification import Notification
@@ -48,11 +50,16 @@ def api_user_results():
 
     if filter_test_time:
         try:
-            test_time_dt = datetime.fromisoformat(filter_test_time)
-            test_time_end = test_time_dt + timedelta(days=1)
+            # Parse frontend date as Tehran local midnight
+            tehran_tz = pytz.timezone('Asia/Tehran')
+            date_str = filter_test_time.split('T')[0]  # Extract YYYY-MM-DD
+            local_dt = datetime.datetime.strptime(date_str, '%Y-%m-%d').replace(tzinfo=tehran_tz)
+            # Convert to UTC for DB comparison
+            start_utc = local_dt.astimezone(pytz.UTC)
+            end_utc = start_utc + timedelta(days=1)
             scores_query = scores_query.filter(
-                Score.test_time >= test_time_dt,
-                Score.test_time < test_time_end
+                Score.test_time >= start_utc,
+                Score.test_time < end_utc
             )
         except ValueError:
             return jsonify({'error': 'Invalid test_time format'}), 400
@@ -91,9 +98,14 @@ def api_user_results():
         }
         result.append(row)
 
-    from datetime import datetime
-    # sort results latest to oldest by test_time
-    result.sort(key=lambda r: (datetime.fromisoformat(r['test_time']) if r['test_time'] else datetime.min, r['username'], r['test_number'], r['attempt_number']), reverse=True)
+    # sort results latest to oldest
+    result.sort(
+        key=lambda r: (
+            datetime.datetime.fromisoformat(r['test_time']) if r['test_time'] else datetime.datetime.min,
+            r['username'], r['test_number'], r['attempt_number']
+        ),
+        reverse=True
+    )
 
     # Apply approved filter if requested
     filter_approved = request.args.get('approved')
@@ -157,11 +169,16 @@ def api_user_results_detail(username):
 
     if filter_test_time:
         try:
-            test_time_dt = datetime.fromisoformat(filter_test_time)
-            test_time_end = test_time_dt + timedelta(days=1)
+            # Parse frontend date as Tehran local midnight
+            tehran_tz = pytz.timezone('Asia/Tehran')
+            date_str = filter_test_time.split('T')[0]  # Extract YYYY-MM-DD
+            local_dt = datetime.datetime.strptime(date_str, '%Y-%m-%d').replace(tzinfo=tehran_tz)
+            # Convert to UTC for DB comparison
+            start_utc = local_dt.astimezone(pytz.UTC)
+            end_utc = start_utc + timedelta(days=1)
             scores_query = scores_query.filter(
-                Score.test_time >= test_time_dt,
-                Score.test_time < test_time_end
+                Score.test_time >= start_utc,
+                Score.test_time < end_utc
             )
         except ValueError:
             return jsonify({'error': 'Invalid test_time format'}), 400

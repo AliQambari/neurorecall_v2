@@ -86,7 +86,7 @@ const UserResults = () => {
     try {
       let testTime = filters.test_time;
       if (testTime) {
-        testTime = `${testTime}T00:00`;
+        testTime = `${testTime}T00:00:00`;
       }
       const formattedFilters = { ...filters, test_time: testTime || '' };
       if (approvedOnly) {

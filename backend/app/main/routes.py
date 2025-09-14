@@ -13,7 +13,8 @@ def index():
 """
 from flask import jsonify, request, session
 from flask_login import login_required, current_user
-from datetime import datetime, timedelta
+import datetime
+import pytz
 
 
 @bp.route('/user-profile', methods=['GET'])
@@ -38,9 +39,14 @@ def api_user_profile():
 
     if f_time:
         try:
-            dt = datetime.fromisoformat(f_time)
-            dt_end = dt + timedelta(days=1)
-            q = q.filter(Score.test_time >= dt, Score.test_time < dt_end)
+            # Parse frontend date as Tehran local midnight
+            tehran_tz = pytz.timezone('Asia/Tehran')
+            date_str = f_time.split('T')[0]  # Extract YYYY-MM-DD
+            local_dt = datetime.strptime(date_str, '%Y-%m-%d').replace(tzinfo=tehran_tz)
+            # Convert to UTC for DB comparison
+            start_utc = local_dt.astimezone(pytz.UTC)
+            end_utc = start_utc + timedelta(days=1)
+            q = q.filter(Score.test_time >= start_utc, Score.test_time < end_utc)
         except ValueError:
             return jsonify({'error': 'Bad date'}), 400
 

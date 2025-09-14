@@ -31,6 +31,7 @@ packaging==24.2
 pydub==0.25.1
 pygments==2.19.2
 python-dotenv==1.0.0
+pytz==2024.1
 redis==5.0.1
 requests==2.32.4
 rich==13.9.4
