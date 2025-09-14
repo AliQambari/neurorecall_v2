@@ -154,6 +154,8 @@ const UserProfileHome = () => {
                     className="form-control search-input"
                     type="date"
                     onChange={onChange}
+                    onInput={onChange}
+                    onBlur={onChange}
                     value={filters.test_time}
                   />
                   <label htmlFor="test_time_filter" className="fw-bold">
@@ -184,7 +186,7 @@ const UserProfileHome = () => {
                 }}
               />
             ) : (
-              <section aria-label={t('Test results', 'نتایج آزمون')}>
+              <section key={`mobile-${JSON.stringify(filters)}`} aria-label={t('Test results', 'نتایج آزمون')}>
                 {data.length === 0 ? (
                   <p className="text-muted mt-3">{t('There are no records to display', 'هیچ داده ای برای نمایش وجود ندارد.')}</p>
                 ) : (
