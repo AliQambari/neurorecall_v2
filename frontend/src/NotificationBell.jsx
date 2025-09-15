@@ -130,7 +130,7 @@ const NotificationBell = () => {
 
   // Format time ago
   const formatTimeAgo = (dateString) => {
-    const date = new Date(dateString);
+    const date = new Date(dateString + 'Z');
     const now = new Date();
     const diffInMinutes = Math.floor((now - date) / (1000 * 60));
     
