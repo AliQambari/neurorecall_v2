@@ -11,8 +11,6 @@ import {
 } from "react-icons/go";
 import "./UserProfileHome.css";
 
-const BASE_URL = process.env.REACT_APP_API_URL;
-
 function useIsDesktop(breakpoint = 992) {
   const query = `(min-width: ${breakpoint}px)`;
   const getMatch = () => (typeof window !== 'undefined' ? window.matchMedia(query).matches : true);
@@ -87,6 +85,7 @@ const UserProfileHome = () => {
         }));
         setUserData(result.user);
         setData(rows);
+        console.log(rows);
       }
     };
     load();
