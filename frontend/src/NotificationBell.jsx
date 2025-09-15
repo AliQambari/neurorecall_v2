@@ -1,6 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { LuBell, LuBellRing, LuCheck, LuCheckCheck, LuX } from 'react-icons/lu';
 import './NotificationBell.css';
+import { useLocation } from 'react-router-dom';
+import { useLanguage } from "./LanguageContext";
+
 
 const NotificationBell = () => {
   const [notifications, setNotifications] = useState([]);
@@ -8,6 +11,17 @@ const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
+
+  const location = useLocation();
+
+  const { language } = useLanguage();
+
+  // ✅ Determine if on home page
+  const onHome = location.pathname === "/";
+
+  // Dynamic color logic
+  const iconColor = onHome ? "white" : "#2d4059 "; // white on home, black elsewhere
+
 
   // Fetch unread count
   const fetchUnreadCount = async () => {
@@ -20,7 +34,7 @@ const NotificationBell = () => {
         setUnreadCount(data.count);
       }
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      console.error(language === "en" ? 'Error fetching unread count:' : "خطا در واکشی تعداد اعلان های خوانده نشده.", error);
     }
   };
 
@@ -36,7 +50,7 @@ const NotificationBell = () => {
         setNotifications(data);
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error(language === "en" ? 'Error fetching notifications:' : "خطا در واکشی اعلان ها.", error);
     } finally {
       setLoading(false);
     }
@@ -60,7 +74,7 @@ const NotificationBell = () => {
         setUnreadCount(prev => Math.max(0, prev - 1));
       }
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      console.error(language === "en" ? 'Error marking notification as read:' : "خطا در نشان کردن اعلان به عنوان خوانده شده.", error);
     }
   };
 
@@ -78,7 +92,7 @@ const NotificationBell = () => {
         setUnreadCount(0);
       }
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      console.error(language === "en" ? 'Error marking all notifications as read:' : "خطا در نشان کردن همه اعلان ها به عنوان خوانده شده", error);
     }
   };
 
@@ -120,14 +134,14 @@ const NotificationBell = () => {
     const now = new Date();
     const diffInMinutes = Math.floor((now - date) / (1000 * 60));
     
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1) return language === "en" ? 'Just now' : "همین الان";
+    if (diffInMinutes < 60) return language === "en" ? `${diffInMinutes}m ago` : `دقیقه پیش${diffInMinutes}`;
     
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInHours < 24) return language === "en" ? `${diffInHours}h ago` : `ساعت پیش${diffInHours}`;
     
     const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays}d ago`;
+    return language === "en" ? `${diffInDays}d ago` : `روز پیش${diffInDays}`;
   };
 
   // Format notification message (extract English part for display)
@@ -147,9 +161,25 @@ const NotificationBell = () => {
         aria-label={`Notifications (${unreadCount} unread)`}
       >
         {unreadCount > 0 ? (
-          <LuBellRing className="notification-icon active" />
+          <>
+            <LuBellRing className="notification-icon active" style={{ color: iconColor }}/>
+            <span 
+              className="notification-text"
+              style={{ color: iconColor }}
+            >
+              {language === "en" ? "Notifications" : "اعلان ها" }
+            </span>
+          </>
         ) : (
-          <LuBell className="notification-icon" />
+          < >
+            <LuBell className="notification-icon" style={{ color: iconColor, marginInlineEnd: "0.5rem" }} />
+            <span 
+              className="notification-text"
+              style={{ color: iconColor }}
+            >
+              {language === "en" ? "Notifications" : "اعلان ها" }
+            </span>
+          </>
         )}
         {unreadCount > 0 && (
           <span className="notification-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
@@ -161,15 +191,15 @@ const NotificationBell = () => {
           <div className="notification-backdrop d-md-none" onClick={() => setIsOpen(false)} />
           <div className="notification-dropdown">
             <div className="notification-header">
-            <h4>Notifications</h4>
+            <h4>{language === "en" ? "Notifications" : "اعلان ها" }</h4>
             <div className="notification-header-actions">
               {unreadCount > 0 && (
                 <button 
                   className="mark-all-read-btn"
                   onClick={markAllAsRead}
-                  title="Mark all as read"
+                  title={language === "en" ? "Mark all as read" : "نشان گذاری همه به عنوان خوانده شده" }
                 >
-                  <LuCheckCheck />
+                  <LuCheckCheck style={{ color: iconColor }}/>
                 </button>
               )}
               <button 
@@ -177,16 +207,16 @@ const NotificationBell = () => {
                 onClick={() => setIsOpen(false)}
                 title="Close"
               >
-                <LuX />
+                <LuX style={{ color: iconColor }}/>
               </button>
             </div>
           </div>
 
           <div className="notification-list">
             {loading ? (
-              <div className="notification-loading">Loading...</div>
+              <div className="notification-loading">{language === "en" ? "Loading..." : "در حال بارگذاری..." }</div>
             ) : notifications.length === 0 ? (
-              <div className="notification-empty">No notifications</div>
+              <div className="notification-empty">{language === "en" ? "No notifications" : "اعلانی یافت نشد" }</div>
             ) : (
               notifications.map((notification) => (
                 <div 
@@ -205,7 +235,7 @@ const NotificationBell = () => {
                     <button
                       className="mark-read-btn"
                       onClick={() => markAsRead(notification.id)}
-                      title="Mark as read"
+                      title={language === "en" ? "Mark as read" : "نشان گذاری به عنوان خوانده شده" }
                     >
                       <LuCheck />
                     </button>

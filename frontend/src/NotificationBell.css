@@ -7,7 +7,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
+  padding: 8px 0;
   border-radius: 50%;
   transition: background-color 0.2s ease;
   position: relative;
@@ -29,6 +29,20 @@
 .notification-icon.active {
   color: #ffc107;
   animation: ring 2s ease-in-out infinite;
+}
+
+/* Default: text visible */
+.notification-text {
+  font-size: 1rem;
+  margin-bottom: 0;
+  display: inline;
+}
+
+/* Desktop (≥992px): hide text */
+@media (min-width: 992px) {
+  .notification-text {
+    display: none;
+  }
 }
 
 @keyframes ring {
