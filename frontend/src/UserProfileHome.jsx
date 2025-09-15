@@ -70,7 +70,7 @@ const UserProfileHome = () => {
         formattedFilters.test_time = `${formattedFilters.test_time}T00:00:00`;
       }
       const qs = new URLSearchParams(formattedFilters).toString();
-      const res = await fetch(`/api/user-profile?${qs}`);
+      const res = await fetch(`/api/user-profile?${qs}`, { cache: 'no-cache' });
       const result = await res.json();
       if (res.ok) {
         const rows = result.scores.map((item) => ({

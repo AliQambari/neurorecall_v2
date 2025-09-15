@@ -87,7 +87,7 @@ def api_user_profile():
     # sort rows latest to oldest by test_time
     rows.sort(key=lambda r: (datetime.datetime.fromisoformat(r['test_time']) if r['test_time'] else datetime.datetime.min, r['test_number'], r['attempt_number']), reverse=True)
 
-    return jsonify({
+    response = jsonify({
         "user": {
             "id": user.id,
             "username": user.username,
@@ -96,6 +96,10 @@ def api_user_profile():
         },
         "scores": rows
     })
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 #----------------------profile photo------------------------ 
 
