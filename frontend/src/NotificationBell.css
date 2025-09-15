@@ -1,6 +1,7 @@
 .notification-bell {
   position: relative;
   display: inline-block;
+  z-index: 10000;
 }
 
 .notification-bell-button {
@@ -18,6 +19,13 @@
 
 .notification-bell-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Prevent hover from creating new stacking context */
+.notification-bell-button:hover {
+  transform: none !important;
+  filter: none !important;
+  will-change: auto !important;
 }
 
 .notification-icon {
@@ -90,21 +98,40 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: 320px;
   max-height: 400px;
-  z-index: 1000;
+  z-index: 99999;
   overflow: hidden;
 }
 
-/* Mobile responsiveness */
-@media (max-width: 768px) {
+/* Force dropdown above everything on desktop */
+@media (min-width: 769px) {
   .notification-dropdown {
-    position: fixed;
-    top: auto;
-    right: 10px;
-    left: 10px;
-    bottom: 10px;
-    width: auto;
-    max-height: 70vh;
-    transform: none;
+    z-index: 2147483647 !important;
+    position: absolute !important;
+  }
+  
+  .notification-bell {
+    z-index: 2147483647 !important;
+  }
+  
+  .notification-bell:hover {
+    z-index: 2147483647 !important;
+  }
+  
+  .notification-bell-button:hover {
+    z-index: 2147483647 !important;
+    transform: none !important;
+  }
+}
+
+.notification-portal {
+  position: fixed !important;
+  z-index: 999999 !important;
+}
+
+/* Mobile responsiveness - positioning handled by JS */
+@media (max-width: 768px) {
+  .notification-portal {
+    max-height: 80vh !important;
   }
   
   .notification-bell {
@@ -113,11 +140,8 @@
 }
 
 @media (max-width: 480px) {
-  .notification-dropdown {
-    right: 5px;
-    left: 5px;
-    bottom: 5px;
-    max-height: 75vh;
+  .notification-portal {
+    max-height: 85vh !important;
   }
 }
 
@@ -167,6 +191,19 @@
   font-size: 1.1rem;
 }
 
+/* Ensure close button is always visible on mobile */
+@media (max-width: 768px) {
+  .close-btn {
+    color: #495057 !important;
+    font-size: 1.2rem;
+    padding: 8px;
+  }
+  
+  .mark-all-read-btn {
+    color: #495057 !important;
+  }
+}
+
 /* Mobile backdrop */
 .notification-backdrop {
   position: fixed;
@@ -193,7 +230,7 @@
 /* Mobile notification list adjustments */
 @media (max-width: 768px) {
   .notification-list {
-    max-height: calc(70vh - 120px);
+    max-height: calc(80vh - 120px);
   }
   
   .notification-header {

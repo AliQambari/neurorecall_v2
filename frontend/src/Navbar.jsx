@@ -46,6 +46,36 @@ export default function Navbar() {
     setThemeClass(onHome ? "navbar-dark" : "navbar-light"); // critical for toggler icon
   }, [location.pathname]);
 
+  useEffect(() => {
+    const closeMenu = () => {
+      if (window.innerWidth < 992) {
+        const collapse = document.getElementById('navbarSupportedContent');
+        if (collapse && collapse.classList.contains('show')) {
+          const toggler = document.querySelector('.navbar-toggler');
+          if (toggler) {
+            toggler.click();
+          }
+        }
+      }
+    };
+
+    const handleClickOutside = (event) => {
+      const navbar = document.querySelector('.navbar-collapse');
+      const toggler = document.querySelector('.navbar-toggler');
+      if (navbar && !navbar.contains(event.target) && !toggler.contains(event.target)) {
+        closeMenu();
+      }
+    };
+
+    window.addEventListener('scroll', closeMenu);
+    document.addEventListener('click', handleClickOutside);
+    
+    return () => {
+      window.removeEventListener('scroll', closeMenu);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   if (!logged) {
     return (
       <nav
@@ -77,7 +107,7 @@ export default function Navbar() {
           >
             <ul className="navbar-nav mb-2 mb-lg-0 pr-0 nav-ul">
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/">
+                <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
                   <GoHome className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Home" : "خانه"}
                 </Link>
@@ -95,13 +125,13 @@ export default function Navbar() {
 
             <ul className="navbar-nav mb-2 mb-lg-0 mt-1">
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/login">
+                <Link className={`nav-link ${linkClass}`} to="/login" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
                   <LuLogIn className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Login" : "ورود"}
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link btn btn-primary px-4 navbarBtn" to="/register">
+                <Link className="nav-link btn btn-primary px-4 navbarBtn" to="/register" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
                   <LuUserPlus className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Register →" : "ثبت نام"}
                 </Link>
@@ -155,19 +185,19 @@ export default function Navbar() {
           >
             <ul className="navbar-nav nav-ul mb-2 mb-lg-0">
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/">
+                <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
                   <GoHome className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Home" : "خانه"}
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/profile">
+                <Link className={`nav-link ${linkClass}`} to="/profile" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
                   <LuUser className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Profile" : "پروفایل"}
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/profile/tests">
+                <Link className={`nav-link ${linkClass}`} to="/profile/tests" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
                   <LuClipboardList className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Tests" : "آزمون ها"}
                 </Link>
@@ -175,7 +205,7 @@ export default function Navbar() {
 
               {isAdmin ? (
                 <li className="nav-item">
-                  <Link className={`nav-link ${linkClass}`} to="/profile/user-results">
+                  <Link className={`nav-link ${linkClass}`} to="/profile/user-results" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
                     <LuUsers className="nav-ico" aria-hidden="true" />
                     {language === "en" ? "User Results" : "نتایج کاربران"}
                   </Link>

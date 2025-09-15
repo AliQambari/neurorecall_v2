@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
+import { createPortal } from 'react-dom';
 import { LuBell, LuBellRing, LuCheck, LuCheckCheck, LuX } from 'react-icons/lu';
 import './NotificationBell.css';
 import { useLocation } from 'react-router-dom';
@@ -15,6 +16,9 @@ const NotificationBell = () => {
   const location = useLocation();
 
   const { language } = useLanguage();
+
+  // Pass language to positioning logic
+  const positioningProps = { language };
 
   // ✅ Determine if on home page
   const onHome = location.pathname === "/";
@@ -186,10 +190,63 @@ const NotificationBell = () => {
         )}
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <>
           <div className="notification-backdrop d-md-none" onClick={() => setIsOpen(false)} />
-          <div className="notification-dropdown">
+          <div 
+            className="notification-dropdown notification-portal"
+            style={(() => {
+              if (!dropdownRef.current) return { zIndex: 999999 };
+              
+              const rect = dropdownRef.current.getBoundingClientRect();
+              const isRTL = language === 'fa';
+              const isMobile = window.innerWidth <= 768;
+              
+              if (isMobile) {
+                return {
+                  position: 'fixed',
+                  top: '5px',
+                  left: '5px',
+                  right: '5px',
+                  width: 'auto',
+                  maxHeight: '90vh',
+                  zIndex: 999999
+                };
+              }
+              
+              // Desktop positioning
+              const dropdownWidth = 320;
+              
+              if (isRTL) {
+                // RTL: align dropdown to left edge of button
+                let leftPos = rect.left;
+                // Ensure it doesn't go off screen
+                if (leftPos + dropdownWidth > window.innerWidth) {
+                  leftPos = window.innerWidth - dropdownWidth - 10;
+                }
+                return {
+                  position: 'fixed',
+                  top: rect.bottom + 5,
+                  left: leftPos,
+                  zIndex: 999999
+                };
+              } else {
+                // LTR: align dropdown to right edge of button
+                let rightPos = window.innerWidth - rect.right;
+                // Ensure it doesn't go off screen
+                if (rect.right - dropdownWidth < 0) {
+                  rightPos = 10;
+                }
+                return {
+                  position: 'fixed',
+                  top: rect.bottom + 5,
+                  right: rightPos,
+                  zIndex: 999999
+                };
+              }
+            })()
+            }
+          >
             <div className="notification-header">
             <h4>{language === "en" ? "Notifications" : "اعلان ها" }</h4>
             <div className="notification-header-actions">
@@ -203,7 +260,7 @@ const NotificationBell = () => {
                 </button>
               )}
               <button 
-                className="close-btn d-md-none"
+                className="close-btn"
                 onClick={() => setIsOpen(false)}
                 title="Close"
               >
@@ -251,7 +308,8 @@ const NotificationBell = () => {
             </div>
           )}
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );
