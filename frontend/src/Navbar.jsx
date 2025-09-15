@@ -93,7 +93,7 @@ export default function Navbar() {
               </li>
             </ul>
 
-            <ul className="navbar-nav mb-2 mb-lg-0">
+            <ul className="navbar-nav mb-2 mb-lg-0 mt-1">
               <li className="nav-item">
                 <Link className={`nav-link ${linkClass}`} to="/login">
                   <LuLogIn className="nav-ico" aria-hidden="true" />
@@ -193,12 +193,10 @@ export default function Navbar() {
               </li>
             </ul>
 
-            <ul className="navbar-nav mb-2 mb-lg-0">
+            <ul className="navbar-nav mb-2 mb-lg-0 mt-2">
               {isAdmin && (
-                <li className="nav-item d-flex align-items-center">
-                  <div className={linkClass}>
-                    <NotificationBell />
-                  </div>
+                <li className="nav-item d-flex align-items-center mb-3">
+                  <NotificationBell />
                 </li>
               )}
               <li className="nav-item">

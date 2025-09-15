@@ -5,6 +5,7 @@ import { useLanguage } from './LanguageContext';
 import { GiBrain } from "react-icons/gi";
 import { BsClipboard2DataFill } from "react-icons/bs";
 import { FaHeadSideVirus } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
 
 
@@ -29,21 +30,21 @@ export default function Home() {
           </h3>
 
           {logged ? (
-            <a
+            <Link
               className={`btn btn-primary px-4 navbarBtn mt-3`}
               aria-current="page"
-              href="/profile/tests"
+              to="/profile/tests"
             >
               {language === "en" ? "Go to Tests →" : "رفتن به آزمون‌ها →"}
-            </a>
+            </Link>
           ) : (
-            <a
+            <Link
               className={`btn btn-primary px-4 navbarBtn mt-3`}
               aria-current="page"
               href="/register"
             >
               {language === "en" ? "Register →" : "ثبت نام →"}
-            </a>
+            </Link>
           )}
         </div>
       </div>
@@ -200,8 +201,7 @@ export default function Home() {
           <div className="row">
             <div className="col-4">
               <h4>{language === "en" ? "Fast Access" : "دسترسی سریع"}</h4>
-              <a href="/">{language === "en" ? "Home" : "خانه"}</a>
-              {/* <a href="/help">Help</a> */}
+              <Link to="/">{language === "en" ? "Home" : "خانه"}</Link>
             </div>
             <div className="col-4">
               <h4>{language === "en" ? "Resources" : "منابع"}</h4>

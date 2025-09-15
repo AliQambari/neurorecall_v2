@@ -4,6 +4,12 @@
   grid-template-columns: 1fr;
   gap: 0.5rem;
 }
+
+input[type="datetime-local"] {
+  position: relative;
+  color: #000;
+}
+
 @media (min-width: 768px) { .profile .filters-grid { grid-template-columns: 1fr 1fr 1fr auto; } }
 
 /* Normalize filter control heights */
