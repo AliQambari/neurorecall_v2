@@ -2,8 +2,8 @@
 # Python / Flask
 # =========================
 # ignore db:
-backend/db/
-backend/voices/
+/backend/db/
+/backend/voices/
 #---------------------
 /backend/app/templates/*
 voices/
