@@ -131,7 +131,7 @@ const UserProfileHome = () => {
             {/* Filters */}
             <form className="profile-filters" onSubmit={(e) => e.preventDefault()}>
               <div className="filters-grid">
-                <div className="form-floating mb-3">
+                <div className="mb-3">
                   <select
                     name="test_number"
                     className="form-control search-input"
@@ -144,10 +144,10 @@ const UserProfileHome = () => {
                     <option value="3">{t('Test 3', 'آزمون ۳')}</option>
                     <option value="4">{t('Test 4', 'آزمون ۴')}</option>
                   </select>
-                  <label className="fw-bold">{t('Filter By Test Number', 'فیلتر بر اساس شماره آزمون')}</label>
                 </div>
-                <div className="form-floating mb-3">
-                  <input
+                <div className="mb-3">
+
+                  {/* <input
                     id="test_time_filter"
                     name="test_time"
                     className="form-control search-input"
@@ -156,12 +156,12 @@ const UserProfileHome = () => {
                     onInput={onChange}
                     onBlur={onChange}
                     value={filters.test_time}
-                  />
-                  <label htmlFor="test_time_filter" className="fw-bold">
+                  /> */}
+                  {/* <label htmlFor="test_time_filter" className="fw-bold">
                     {t('Filter by Test Date', 'فیلتر بر اساس تاریخ آزمون')}
-                  </label>
+                  </label> */}
                 </div>
-                <button onClick={onReset} className="btn btn-primary px-3">
+                <button onClick={onReset} className="btn btn-remove-filter">
                   {t('Reset', 'حذف فیلترها')}
                 </button>
               </div>
