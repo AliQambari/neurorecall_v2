@@ -9,6 +9,13 @@ import {
   GoHash,
   GoTrophy,
 } from "react-icons/go";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import DatePicker from "react-multi-date-picker";
+import gregorian from "react-date-object/calendars/gregorian";
+import english from "react-date-object/locales/gregorian_en";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+import transition from "react-element-popper/animations/transition";
 import "./UserProfileHome.css";
 
 function useIsDesktop(breakpoint = 992) {
@@ -41,6 +48,8 @@ function useIsDesktop(breakpoint = 992) {
 
 const UserProfileHome = () => {
   const [filters, setFilters] = useState({ test_number: '', test_time: '' });
+  const [gregorianDate, setGregorianDate] = useState('');
+  const [jalaliDate, setJalaliDate] = useState('');
   const [data, setData] = useState([]);
   const [userData, setUserData] = useState([]);
   const { language } = useLanguage();
@@ -65,7 +74,10 @@ const UserProfileHome = () => {
     const load = async () => {
       const formattedFilters = { ...filters };
       if (formattedFilters.test_time) {
-        formattedFilters.test_time = `${formattedFilters.test_time}T00:00:00`;
+        formattedFilters.test_time = `${gregorianDate}T00:00:00`;
+      }
+      if (formattedFilters.test_number === 'all') {
+        formattedFilters.test_number = '';
       }
       const qs = new URLSearchParams(formattedFilters).toString();
       const res = await fetch(`/api/user-profile?${qs}`, { cache: 'no-cache' });
@@ -85,13 +97,57 @@ const UserProfileHome = () => {
         }));
         setUserData(result.user);
         setData(rows);
-        console.log(rows);
       }
     };
     load();
-  }, [filters, language]);
+  }, [filters, language, gregorianDate]);
 
+  // First Filter Input Change Handler
   const onChange = (e) => setFilters((f) => ({ ...f, [e.target.name]: e.target.value }));
+  
+  // Convert Jalali DateObject to Gregorian YYYY-MM-DD
+  function convertToGregorian(dateObject) {
+    if (!dateObject) return null;
+
+    // Convert directly to JS Date (Gregorian)
+    const gDate = dateObject.toDate();
+
+    const yyyy = gDate.getFullYear();
+    const mm = String(gDate.getMonth() + 1).padStart(2, "0");
+    const dd = String(gDate.getDate()).padStart(2, "0");
+
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function convertToJalali(dateObject) {
+    if (!dateObject) return null;
+
+    // Convert the given DateObject to Jalali calendar
+    const jalaliDate = dateObject.convert(persian, persian_fa);
+
+    // Return formatted Jalali date as "YYYY-MM-DD"
+    return jalaliDate.format("YYYY-MM-DD");
+  }
+
+  const handleDatePickerChange = (value) => {
+    if (!value) {
+      setFilters((f) => ({ ...f, test_time: '' }));
+      setGregorianDate('');
+      setJalaliDate('');
+      return;
+    }
+
+    // Update both formats
+    const gDate = convertToGregorian(value);
+    const jDate = convertToJalali(value);
+
+    setGregorianDate(gDate);
+    setJalaliDate(jDate);
+
+    // Use the raw picker format for filters (this matches the current calendar)
+    setFilters((f) => ({ ...f, test_time: value.format('YYYY-MM-DD') }));
+  };
+
   const onReset = () => setFilters({ test_number: '', test_time: '' });
 
   const handlePhotoChange = async (e) => {
@@ -129,7 +185,7 @@ const UserProfileHome = () => {
             <h3 className="mb-4 mb-md-5">{t('Test Results', 'نتایج آزمون ها')}</h3>
 
             {/* Filters */}
-            <form className="profile-filters" onSubmit={(e) => e.preventDefault()}>
+            <form className="profile-filters" noValidate onSubmit={(e) => e.preventDefault()}>
               <div className="filters-grid">
                 <div className="mb-3">
                   <select
@@ -137,8 +193,12 @@ const UserProfileHome = () => {
                     className="form-control search-input"
                     onChange={onChange}
                     value={filters.test_number}
+                    required
                   >
-                    <option value="">{t('All Tests', 'همه آزمون ها')}</option>
+                    <option value="" disabled hidden>
+                      {t('Filter based on test number', 'فیلتر بر اساس شماره آزمون')}
+                    </option>
+                    <option value="all">{t('All Tests', 'همه آزمون ها')}</option>
                     <option value="1">{t('Test 1', 'آزمون ۱')}</option>
                     <option value="2">{t('Test 2', 'آزمون ۲')}</option>
                     <option value="3">{t('Test 3', 'آزمون ۳')}</option>
@@ -146,23 +206,31 @@ const UserProfileHome = () => {
                   </select>
                 </div>
                 <div className="mb-3">
-
-                  {/* <input
-                    id="test_time_filter"
+                  <DatePicker 
+                    value={filters.test_time ? (language === "en" ? gregorianDate : jalaliDate) : ''}
+                    onChange={handleDatePickerChange}
                     name="test_time"
-                    className="form-control search-input"
-                    type="date"
-                    onChange={onChange}
-                    onInput={onChange}
-                    onBlur={onChange}
-                    value={filters.test_time}
-                  /> */}
-                  {/* <label htmlFor="test_time_filter" className="fw-bold">
-                    {t('Filter by Test Date', 'فیلتر بر اساس تاریخ آزمون')}
-                  </label> */}
+                    calendar={language === "en" ? gregorian : persian}
+                    locale={language === "en" ? english : persian_fa}
+                    placeholder={t('Filter based on test date', 'فیلتر بر اساس تاریخ آزمون')}
+                    animations={[
+                      transition({
+                        from: 35,
+                        transition: "all 400ms cubic-bezier(0.335, 0.010, 0.030, 1.360)",
+                      }),
+                    ]} 
+                  >
+                  </DatePicker>
+                  <FaRegCalendarAlt 
+                    className="calendar-icon" 
+                    color="#22326E" size={20}
+                    style={{
+                      float: language === "en" ? "right" : "left",
+                    }}
+                  />
                 </div>
                 <button onClick={onReset} className="btn btn-remove-filter">
-                  {t('Reset', 'حذف فیلترها')}
+                  {t('Reset Filters', 'حذف فیلترها')}
                 </button>
               </div>
             </form>

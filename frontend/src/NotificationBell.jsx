@@ -18,7 +18,6 @@ const NotificationBell = () => {
   const { language } = useLanguage();
 
   // Pass language to positioning logic
-  const positioningProps = { language };
 
   // ✅ Determine if on home page
   const onHome = location.pathname === "/";
@@ -139,13 +138,13 @@ const NotificationBell = () => {
     const diffInMinutes = Math.floor((now - date) / (1000 * 60));
     
     if (diffInMinutes < 1) return language === "en" ? 'Just now' : "همین الان";
-    if (diffInMinutes < 60) return language === "en" ? `${diffInMinutes}m ago` : `دقیقه پیش${diffInMinutes}`;
+    if (diffInMinutes < 60) return language === "en" ? `${diffInMinutes}m ago` : `${diffInMinutes} دقیقه پیش`;
     
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) return language === "en" ? `${diffInHours}h ago` : `ساعت پیش${diffInHours}`;
     
     const diffInDays = Math.floor(diffInHours / 24);
-    return language === "en" ? `${diffInDays}d ago` : `روز پیش${diffInDays}`;
+    return language === "en" ? `${diffInDays}d ago` : `${diffInDays} روز پیش`;
   };
 
   // Format notification message (extract English part for display)
