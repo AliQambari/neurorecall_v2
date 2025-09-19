@@ -10,7 +10,15 @@ import {
   GoHash,
   GoTrophy,
 } from "react-icons/go";
+import { PiSealCheckFill } from "react-icons/pi";
 import { LuUser } from "react-icons/lu";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import DatePicker from "react-multi-date-picker";
+import gregorian from "react-date-object/calendars/gregorian";
+import english from "react-date-object/locales/gregorian_en";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+import transition from "react-element-popper/animations/transition";
 import "./UserProfileHome.css";
 
 
@@ -43,7 +51,9 @@ const UserResults = () => {
   const isDesktop = useIsDesktop(992);
 
   const columns = [
-    { name: t('Username', 'نام کاربری'), selector: (row) => <Link to={`/admin/user/${row.username}`}>{row.username}</Link>, sortable: false, width: '180px' },
+    { name: t('Username', 'نام کاربری'), selector: (row) => 
+      <Link className="username-link" to={`/admin/user/${row.username}`}>{row.username}</Link>
+    , sortable: false, width: '180px' },
     { name: t('Age', 'سن'), selector: (row) => row.age, sortable: true, width: '80px' },
     { name: t('Gender', 'جنسیت'), selector: (row) => (row.gender === 'female' ? t('female', 'زن') : t('male', 'مرد')), sortable: true, width: '110px' },
     { name: t('Test Number', 'شماره آزمون'), selector: (row) => row.test_number, sortable: false, width: '120px' },
@@ -66,6 +76,10 @@ const UserResults = () => {
   const [approvedOnly, setApprovedOnly] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Date States
+  const [gregorianDate, setGregorianDate] = useState('');
+  const [jalaliDate, setJalaliDate] = useState('');
+
   // fetch admin info
   useEffect(() => {
     const fetchAdminInfo = async () => {
@@ -87,11 +101,17 @@ const UserResults = () => {
     try {
       let testTime = filters.test_time;
       if (testTime) {
-        testTime = `${testTime}T00:00:00`;
+        testTime = `${gregorianDate}T00:00:00`;
       }
       const formattedFilters = { ...filters, test_time: testTime || '' };
       if (approvedOnly) {
         formattedFilters.approved = 'Yes';
+      }
+      if (formattedFilters.test_number === 'all') {
+        formattedFilters.test_number = '';
+      }
+      if (formattedFilters.username === 'all') {
+        formattedFilters.username = '';
       }
       const query = new URLSearchParams(formattedFilters).toString();
       const response = await fetch(`/api/admin/user-results?${query}`, {
@@ -121,15 +141,70 @@ const UserResults = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters, language, approvedOnly]);
+  }, [filters, language, approvedOnly, gregorianDate]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  // Activate Bootstrap Tooktip in React
+  useEffect(() => {
+    // Dynamically import Bootstrap JS to ensure it's loaded
+    import('bootstrap/dist/js/bootstrap.bundle.min.js').then(({ Tooltip }) => {
+      // Initialize all tooltips on the page
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltipTriggerList].forEach(el => new Tooltip(el));
+    });
+  }, []);
+
   const handleChange = (e) => setFilters({ ...filters, [e.target.name]: e.target.value });
+
+  // Convert Jalali DateObject to Gregorian YYYY-MM-DD
+  function convertToGregorian(dateObject) {
+    if (!dateObject) return null;
+
+    // Convert directly to JS Date (Gregorian)
+    const gDate = dateObject.toDate();
+
+    const yyyy = gDate.getFullYear();
+    const mm = String(gDate.getMonth() + 1).padStart(2, "0");
+    const dd = String(gDate.getDate()).padStart(2, "0");
+
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function convertToJalali(dateObject) {
+    if (!dateObject) return null;
+
+    // Convert the given DateObject to Jalali calendar
+    const jalaliDate = dateObject.convert(persian, persian_fa);
+
+    // Return formatted Jalali date as "YYYY-MM-DD"
+    return jalaliDate.format("YYYY-MM-DD");
+  }
+
+  const handleDatePickerChange = (value) => {
+    if (!value) {
+      setFilters((f) => ({ ...f, test_time: '' }));
+      setGregorianDate('');
+      setJalaliDate('');
+      return;
+    }
+
+    // Update both formats
+    const gDate = convertToGregorian(value);
+    const jDate = convertToJalali(value);
+
+    setGregorianDate(gDate);
+    setJalaliDate(jDate);
+
+    // Use the raw picker format for filters (this matches the current calendar)
+    setFilters((f) => ({ ...f, test_time: value.format('YYYY-MM-DD') }));
+  };
+
   const handleReset = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setFilters({ username: "", test_number: "", test_time: "" });
+    setFilters({ username: "", test_number: "", test_time: ""});
+    setApprovedOnly(false);
   };
 
   const handlePhotoChange = async (e) => {
@@ -162,59 +237,79 @@ const UserResults = () => {
 
         <div className="col-12 col-lg-11 py-5 px-3 px-lg-5">
           <div className="px-0 px-md-2 py-3 py-md-5">
-            <h3 className="mb-3">{t('User Results', 'نتایج کاربران')}</h3>
+            <h3 className="mb-5">{t('User Results', 'نتایج کاربران')}</h3>
             <div className="alert alert-info py-2" role="alert">
               {t('Tip: Click a username to view their progress and detailed results.', 'نکته: برای مشاهده روند پیشرفت و جزئیات نتایج هر کاربر روی نام کاربری او کلیک کنید.')}
             </div>
 
             {/* Filters */}
-            <form className="profile-filters" onSubmit={(e) => e.preventDefault()}>
-              <div className="filters-grid">
-                <div className="form-floating mb-3">
+            <form className="profile-filters" noValidate onSubmit={(e) => e.preventDefault()}>
+              <div className="filters-grid-user-results">
+                <div className="mb-3">
                   <select
-                    className="form-control"
+                    className="form-control search-input"
+                    name="username"
+                    value={filters.username}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="" disabled hidden>
+                        {t('Filter based on username', 'فیلتر بر اساس نام کاربری')}
+                    </option>
+                    <option value="all">{t('All Users', 'تمام کاربران')}</option>
+                    {userOptions.map((username, idx) => (
+                      <option key={idx} value={username}>{username}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <select
+                    className="form-control search-input"
                     name="test_number"
                     onChange={handleChange}
                     value={filters.test_number}
+                    required
                   >
-                    <option value="">{t('All Tests', 'همه آزمون ها')}</option>
+                    <option value="" disabled hidden>
+                      {t('Filter based on test number', 'فیلتر بر اساس شماره آزمون')}
+                    </option>
+                    <option value="all">{t('All Tests', 'همه آزمون ها')}</option>
                     <option value="1">{t('Test 1', 'آزمون ۱')}</option>
                     <option value="2">{t('Test 2', 'آزمون ۲')}</option>
                     <option value="3">{t('Test 3', 'آزمون ۳')}</option>
                     <option value="4">{t('Test 4', 'آزمون ۴')}</option>
                   </select>
-                  <label className="fw-bold">{t('Filter by Test Number', 'فیلتر بر اساس شماره آزمون')}</label>
                 </div>
-                <div className="form-floating mb-3">
-                  <input
-                    id="test_time_filter"
-                    className="form-control"
+                <div className="mb-3">
+                  <DatePicker 
+                    value={filters.test_time ? (language === "en" ? gregorianDate : jalaliDate) : ''}
+                    onChange={handleDatePickerChange}
                     name="test_time"
-                    type="date"
-                    onChange={handleChange}
-                    value={filters.test_time}
+                    calendar={language === "en" ? gregorian : persian}
+                    locale={language === "en" ? english : persian_fa}
+                    placeholder={t('Filter based on test date', 'فیلتر بر اساس تاریخ آزمون')}
+                    animations={[
+                      transition({
+                        from: 35,
+                        transition: "all 400ms cubic-bezier(0.335, 0.010, 0.030, 1.360)",
+                      }),
+                    ]} 
+                  >
+                  </DatePicker>
+                  <FaRegCalendarAlt 
+                    className="calendar-icon" 
+                    color="#22326E" size={20}
+                    style={{
+                      float: language === "en" ? "right" : "left",
+                    }}
                   />
-                  <label htmlFor="test_time_filter" className="fw-bold">
-                    {t('Filter by Test Date', 'فیلتر بر اساس تاریخ آزمون')}
-                  </label>
                 </div>
-                <select
-                  className="form-control"
-                  name="username"
-                  value={filters.username}
-                  onChange={handleChange}
-                >
-                  <option value="">{t('All Users', 'تمام کاربران')}</option>
-                  {userOptions.map((username, idx) => (
-                    <option key={idx} value={username}>{username}</option>
-                  ))}
-                </select>
-                <button type="button" className="btn btn-primary" onClick={handleReset}>
-                  {t('Reset', 'حذف فیلترها')}
-                </button>
+                
                 <button
                   type="button"
-                  className={`btn ${approvedOnly ? 'btn-success' : 'btn-outline-success'}`}
+                  className={`btn btn-approved-filter ${approvedOnly ? 'btn-approved' : 'btn-all-results'}`}
+                  data-bs-toggle="tooltip" title={t('Filter based on approval', 'فیلتر تایید شده‌ها')}
+                  data-bs-custom-class="custom-tooltip"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -222,7 +317,11 @@ const UserResults = () => {
                   }}
                   disabled={loading}
                 >
-                  {loading ? t('Loading...', 'در حال بارگذاری...') : (approvedOnly ? t('Show All', 'نمایش همه') : t('Approved Only', 'فقط تایید شده'))}
+                  {loading ? '...' : <PiSealCheckFill />}
+                </button>
+
+                <button type="button" className="btn btn-remove-filter" onClick={handleReset}>
+                  {t('Reset Filters', 'حذف فیلترها')}
                 </button>
               </div>
             </form>
@@ -271,7 +370,7 @@ const UserResults = () => {
                       const rounds = [1, 2, 3, 4, 5].map((n) => ({ n, v: row[`round${n}`] ?? '—' }));
                       const gLabel = row.gender === 'female' ? t('female', 'زن') : t('male', 'مرد');
                       return (
-                        <article key={`${row.username}-${row.test_number}`} className={`result-card ${approved ? 'approved' : ''}`} aria-label={t('Result card', 'کارت نتیجه')}>
+                        <article key={`${row.username}-${row.test_number}-${row.attempt_number}`} className={`result-card ${approved ? 'approved' : ''}`} aria-label={t('Result card', 'کارت نتیجه')}>
                           <header className="card-head">
                             <div className="title-wrap">
                               <span className="hash"><GoHash aria-hidden /></span>
@@ -288,7 +387,7 @@ const UserResults = () => {
 
                           {/* Identity row */}
                           <div className="px-3 pt-2 pb-1 d-flex flex-wrap gap-2 align-items-center">
-                            <span className="chip"><Link to={`/admin/user/${row.username}`}><LuUser aria-hidden /> {row.username}</Link></span>
+                            <span className="chip"><Link className="username-link" to={`/admin/user/${row.username}`}><LuUser aria-hidden /> {row.username}</Link></span>
                             <span className="chip">{t('Age', 'سن')}: {row.age}</span>
                             <span className="chip">{t('Gender', 'جنسیت')}: {gLabel}</span>
                           </div>

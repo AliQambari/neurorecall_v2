@@ -1,5 +1,6 @@
 .profile .profile-filters { margin-bottom: 0.75rem; }
-.profile .filters-grid {
+.profile .filters-grid,
+.profile .filters-grid-user-results {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.5rem;
@@ -25,10 +26,6 @@
 
 select:invalid { color: gray; }
 
-.calendar-icon {
-  margin-inline-end: 0.7rem;
-  transform: translateY(-2.1rem);
-}
 /* Date Picker */
 .rmdp-container { display: block !important;}
 .rmdp-input {
@@ -42,13 +39,39 @@ select:invalid { color: gray; }
   margin-top: 0;
 }
 
+.calendar-icon {
+  margin-inline-end: 0.7rem;
+  transform: translateY(-2.1rem);
+}
 
-.btn-remove-filter { background-color: #22326E; color: #fff; padding: 9px 0; }
+/* Approval Filter Button */
+.btn-approved-filter {
+  height: 45px;
+  border: 1px solid #ccc;
+  padding: 0 12px;
+  background-color: #fff;
+  color: #22326E;
+  appearance: none; /* for consistent cross-browser styling */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color .2s;
+}
+
+.btn-approved-filter:hover, .btn-approved { color: white; background-color: #22326E;}
+.btn-approved:hover { background-color: #2F46A1;}
+/* .custom-tooltip {
+  --bs-tooltip-bg: var(--bd-violet-bg);
+  --bs-tooltip-color: var(--bs-white);
+} */
+
+.btn-remove-filter { background-color: #22326E; color: #fff; padding: 9px 20px; }
 .btn-remove-filter:hover { color: #fff; background-color: #2F46A1;}
+
+
 @media (min-width: 768px) { .profile .filters-grid { grid-template-columns: 1fr 1fr 1fr auto; } }
+@media (min-width: 768px) { .profile .filters-grid-user-results { grid-template-columns: 1fr 1fr 1fr auto auto; } }
 
 /* Normalize filter control heights */
 .profile .filters-grid { align-items: start; }
+.profile .filters-grid-user-results { align-items: start; }
 
 /* Card grid */
 .profile .cards-grid {
@@ -60,6 +83,13 @@ select:invalid { color: gray; }
 @media (min-width: 768px) { .profile .cards-grid { grid-template-columns: 1fr 1fr; } }
 
 /* Card */
+.username-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.username-link:hover { color: #2F46A1; }
+
 .profile .result-card {
   background: #fff;
   border-radius: 14px;
@@ -115,8 +145,4 @@ select:invalid { color: gray; }
 /* Sidebar adjustments on mobile */
 @media (max-width: 991.98px) {
   .profile .sidebar { order: -1; }
-}
-
-.profile .result-card.approved {
-  background-color: #d4edda;
 }
