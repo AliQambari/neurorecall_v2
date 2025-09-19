@@ -1,0 +1,12 @@
+.close-button {
+    border: 1px solid grey;
+    border-radius: 3px;
+    background-color: white;
+    padding: 0 8px;
+    margin-inline-end: 13px;
+}
+
+.modal-header-container {
+    display: flex;
+    justify-content: space-between;
+}

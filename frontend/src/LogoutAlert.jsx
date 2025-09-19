@@ -2,6 +2,7 @@ import { Fragment, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import { useLanguage } from './LanguageContext';
+import "./LogoutAlert.css";
 
 function LogoutAlert({ alertText, buttonText, isVisible, onClose }) {
   //const [isLoading, setIsLoading] = useState(false);
@@ -45,13 +46,13 @@ function LogoutAlert({ alertText, buttonText, isVisible, onClose }) {
       >
         <div className="modal-dialog modal-dialog-centered" role="document">
           <div className="modal-content">
-            <div className="modal-header">
+            <div className="modal-header modal-header-container">
               <h5 className="modal-title">
                 {language === "en" ? "Log Out" : "خروج از حساب کاربری" }
               </h5>
               <button
                 type="button"
-                className="close"
+                className="close-button"
                 onClick={onClose}
                 aria-label="Close"
               >
@@ -64,7 +65,7 @@ function LogoutAlert({ alertText, buttonText, isVisible, onClose }) {
                 type="button"
                 className="btn btn-secondary"
                 onClick={onClose}
-                style={{ marginInlineEnd: "1rem", marginBottom: "2rem" }}
+                style={{ marginInlineEnd: "0.5rem", marginBottom: "2rem" }}
               >
                 {language === "en" ? "Close" : "انصراف" } 
               </button>
@@ -73,7 +74,7 @@ function LogoutAlert({ alertText, buttonText, isVisible, onClose }) {
                 type="button" 
                 className="btn btn-primary" 
                 data-bs-dismiss="modal"
-                style={{ marginRight: "1rem", marginBottom: "2rem" }}
+                style={{ marginInlineEnd: "1rem", marginBottom: "2rem" }}
               >
                 {buttonText}
               </button>
