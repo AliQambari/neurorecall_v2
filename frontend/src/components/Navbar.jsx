@@ -1,6 +1,4 @@
-// src/components/Navbar.jsx
 import React, { useEffect, useState, useContext, useRef, Fragment } from "react";
-import { Collapse } from 'bootstrap';
 import "../styles/Navbar.css";
 import { AuthContext } from "./AuthContext";
 import { Link, useLocation } from "react-router-dom";
@@ -18,8 +16,6 @@ import {
 import { GoHome } from "react-icons/go";
 import NotificationBell from "./NotificationBell";
 
-
-
 export default function Navbar() {
   const { logged, isAdmin } = useContext(AuthContext);
 
@@ -32,9 +28,10 @@ export default function Navbar() {
   // Logout Modal
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Hamburger Menu
+  // Hamburger Menu (React-only state)
+  const [menuOpen, setMenuOpen] = useState(false);
+  
   const collapseRef = useRef(null);
-  const collapseInstanceRef = useRef(null);
 
   const location = useLocation();
   const { language, toggleLanguage } = useLanguage();
@@ -44,6 +41,7 @@ export default function Navbar() {
     setIsModalVisible(true);
   };
 
+  // Update navbar styles based on route
   useEffect(() => {
     const onHome = location.pathname === "/";
     setBgClass(onHome ? "HomeBackground" : "GeneralBackground");
@@ -52,73 +50,44 @@ export default function Navbar() {
     setThemeClass(onHome ? "navbar-dark" : "navbar-light"); // critical for toggler icon
   }, [location.pathname]);
 
-
-  // Close Hamburger Menu
-  const closeCollapseSafe = () => {
-    if (window.innerWidth >= 992) return; // only on mobile/tablet
-
-    const instance = collapseInstanceRef.current;
-    if (instance) {
-      // use API
-      instance.hide();
-    } else {
-      // fallback to toggler click if instance not ready
-      const toggler = document.querySelector('.navbar-toggler');
-      if (toggler) toggler.click();
+  // Close menu safely on mobile/tablet
+  const closeMenu = () => {
+    if (window.innerWidth < 992) {
+      setMenuOpen(false);
     }
   };
 
-
+  // Close menu when clicking outside or scrolling
   useEffect(() => {
-    const el = collapseRef.current;
-    if (!el) return;
-
-    // getOrCreateInstance prevents double instances
-    collapseInstanceRef.current = Collapse.getOrCreateInstance(el, { toggle: false });
-
-    return () => {
-      if (collapseInstanceRef.current) {
-        try {
-          // Immediately hide without transition
-          collapseInstanceRef.current._isTransitioning = false;
-          collapseInstanceRef.current.hide();
-          collapseInstanceRef.current.dispose();
-        } catch (e) {
-          console.warn("Safe collapse cleanup:", e);
-        }
-        collapseInstanceRef.current = null;
-      }
-    };
-
-  }, [logged]);
-
-  useEffect(() => {
-    const closeMenu = () => {
-      if (window.innerWidth < 992) {
-        const el = collapseRef.current;
-        if (el && el.classList.contains('show')) {
-          closeCollapseSafe();
-        }
-      }
-    };
-
     const handleClickOutside = (event) => {
       const navbar = collapseRef.current;
-      const toggler = document.querySelector('.navbar-toggler');
-      if (navbar && !navbar.contains(event.target) && !(toggler && toggler.contains(event.target))) {
-        closeMenu();
+      const toggler = document.querySelector(".navbar-toggler");
+      if (
+        menuOpen &&
+        navbar &&
+        !navbar.contains(event.target) &&
+        !(toggler && toggler.contains(event.target))
+      ) {
+        setMenuOpen(false);
       }
     };
 
-    window.addEventListener('scroll', closeMenu);
-    document.addEventListener('click', handleClickOutside);
-    
-    return () => {
-      window.removeEventListener('scroll', closeMenu);
-      document.removeEventListener('click', handleClickOutside);
+    const handleScroll = () => {
+      if (menuOpen && window.innerWidth < 992) {
+        setMenuOpen(false);
+      }
     };
-  }, []);
 
+    window.addEventListener("scroll", handleScroll);
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [menuOpen]);
+
+  // ---------- JSX ----------
   if (!logged) {
     return (
       <nav
@@ -130,36 +99,32 @@ export default function Navbar() {
             NeuroRecall
           </Link>
 
+          {/* Hamburger Button */}
           <button
             className="navbar-toggler"
             type="button"
             aria-controls="navbarSupportedContent"
-            aria-expanded="false"
+            aria-expanded={menuOpen ? "true" : "false"}
             aria-label="Toggle navigation"
-            onClick={() => {
-              if (collapseRef.current && collapseInstanceRef.current) {
-                const isShown = collapseRef.current.classList.contains('show');
-                if (isShown) {
-                  collapseInstanceRef.current.hide();
-                } else {
-                  collapseInstanceRef.current.show();
-                }
-              }
-            }}
+            onClick={() => setMenuOpen((prev) => !prev)}
           >
             <span className="navbar-toggler-icon" />
           </button>
 
-
+          {/* Collapse Menu */}
           <div
             ref={collapseRef}
-            className="collapse navbar-collapse"
+            className={`collapse navbar-collapse ${menuOpen ? "show" : ""}`}
             id="navbarSupportedContent"
-            style={{ justifyContent: "space-between" }} // keeps LTR/RTL symmetric without Bootstrap RTL build
+            style={{ justifyContent: "space-between" }}
           >
             <ul className="navbar-nav mb-2 mb-lg-0 pr-0 nav-ul">
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                <Link
+                  className={`nav-link ${linkClass}`}
+                  to="/"
+                  onClick={closeMenu}
+                >
                   <GoHome className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Home" : "خانه"}
                 </Link>
@@ -177,13 +142,21 @@ export default function Navbar() {
 
             <ul className="navbar-nav mb-2 mb-lg-0 mt-1">
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/login" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                <Link
+                  className={`nav-link ${linkClass}`}
+                  to="/login"
+                  onClick={closeMenu}
+                >
                   <LuLogIn className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Login" : "ورود"}
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link btn btn-primary px-4 navbarBtn" to="/register" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                <Link
+                  className="nav-link btn btn-primary px-4 navbarBtn"
+                  to="/register"
+                  onClick={closeMenu}
+                >
                   <LuUserPlus className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Register →" : "ثبت نام"}
                 </Link>
@@ -216,61 +189,69 @@ export default function Navbar() {
               NeuroRecall
             </Link>
 
+            {/* Hamburger Button */}
             <button
               className="navbar-toggler"
               type="button"
               aria-controls="navbarSupportedContent"
-              aria-expanded="false"
+              aria-expanded={menuOpen ? "true" : "false"}
               aria-label="Toggle navigation"
-              onClick={() => {
-                if (collapseRef.current && collapseInstanceRef.current) {
-                  const isShown = collapseRef.current.classList.contains('show');
-                  if (isShown) {
-                    collapseInstanceRef.current.hide();
-                  } else {
-                    collapseInstanceRef.current.show();
-                  }
-                }
-              }}
+              onClick={() => setMenuOpen((prev) => !prev)}
             >
               <span className="navbar-toggler-icon" />
             </button>
 
-
+            {/* Collapse Menu */}
             <div
               ref={collapseRef}
-              className="collapse navbar-collapse"
+              className={`collapse navbar-collapse ${menuOpen ? "show" : ""}`}
               id="navbarSupportedContent"
               style={{ justifyContent: "space-between" }}
             >
               <ul className="navbar-nav nav-ul mb-2 mb-lg-0">
                 <li className="nav-item">
-                  <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                  <Link
+                    className={`nav-link ${linkClass}`}
+                    to="/"
+                    onClick={closeMenu}
+                  >
                     <GoHome className="nav-ico" aria-hidden="true" />
                     {language === "en" ? "Home" : "خانه"}
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className={`nav-link ${linkClass}`} to="/profile" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                  <Link
+                    className={`nav-link ${linkClass}`}
+                    to="/profile"
+                    onClick={closeMenu}
+                  >
                     <LuUser className="nav-ico" aria-hidden="true" />
                     {language === "en" ? "Profile" : "پروفایل"}
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className={`nav-link ${linkClass}`} to="/profile/tests" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                  <Link
+                    className={`nav-link ${linkClass}`}
+                    to="/profile/tests"
+                    onClick={closeMenu}
+                  >
                     <LuClipboardList className="nav-ico" aria-hidden="true" />
                     {language === "en" ? "Tests" : "آزمون ها"}
                   </Link>
                 </li>
 
-                {isAdmin ? (
+                {isAdmin && (
                   <li className="nav-item">
-                    <Link className={`nav-link ${linkClass}`} to="/profile/user-results" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                    <Link
+                      className={`nav-link ${linkClass}`}
+                      to="/profile/user-results"
+                      onClick={closeMenu}
+                    >
                       <LuUsers className="nav-ico" aria-hidden="true" />
                       {language === "en" ? "User Results" : "نتایج کاربران"}
                     </Link>
                   </li>
-                ) : null}
+                )}
 
                 <li className="nav-item">
                   <button
@@ -305,7 +286,4 @@ export default function Navbar() {
       </Fragment>
     );
   }
-
-  
 }
-

@@ -102,6 +102,7 @@
   box-shadow: 0 0 0 0.2rem rgba(142, 194, 242, 0.35); /* why: visible focus state */
 }
 
+
 /* ===== Responsive: Mobile (<768px) ===== */
 @media (max-width: 767.98px) {
   .navbarBrand {
