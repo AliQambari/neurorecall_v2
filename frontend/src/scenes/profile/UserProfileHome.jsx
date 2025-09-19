@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import ProfileImageUpload from "./ProfileImageUpload";
-import { useLanguage } from './LanguageContext';
+import ProfileImageUpload from "../../components/ProfileImageUpload";
+import { useLanguage } from '../../components/LanguageContext';
 import {
   GoCheckCircle,
   GoXCircle,
@@ -16,7 +16,7 @@ import english from "react-date-object/locales/gregorian_en";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import transition from "react-element-popper/animations/transition";
-import "./UserProfileHome.css";
+import "../../styles/UserProfileHome.css";
 
 function useIsDesktop(breakpoint = 992) {
   const query = `(min-width: ${breakpoint}px)`;

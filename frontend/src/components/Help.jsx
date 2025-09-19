@@ -1,5 +1,5 @@
 import React from "react";
-import "./Help.css";
+import "../styles/Help.css";
 import { useLanguage } from './LanguageContext';
 import { LuMic, LuSend } from "react-icons/lu";
 import { FaPlayCircle } from "react-icons/fa";

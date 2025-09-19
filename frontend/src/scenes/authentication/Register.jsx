@@ -1,8 +1,8 @@
 import React, { useState, useEffect, Fragment } from "react";
-import "./Authentication.css";
+import "../../styles/Authentication.css";
 import { useNavigate, Link } from "react-router-dom";
 import PuffLoader from "react-spinners/PuffLoader";
-import { useLanguage } from './LanguageContext';
+import { useLanguage } from '../../components/LanguageContext';
 
 export default function Register() {
   // Form states

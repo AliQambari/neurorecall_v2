@@ -6,8 +6,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider  } from "./AuthContext";
-import { LanguageProvider } from './LanguageContext';
+import { AuthProvider  } from "./components/AuthContext";
+import { LanguageProvider } from './components/LanguageContext';
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

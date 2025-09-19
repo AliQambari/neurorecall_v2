@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import "./Authentication.css";
-import AuthAlert from "./AuthAlert";
+import "../../styles/Authentication.css";
+import AuthAlert from "../../components/AuthAlert";
 import PuffLoader from "react-spinners/PuffLoader";
-import { useLanguage } from './LanguageContext';
+import { useLanguage } from '../../components/LanguageContext';
 import { Link } from "react-router-dom";
 
 export default function Forgotpassword() {

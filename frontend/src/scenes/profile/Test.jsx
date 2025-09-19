@@ -1,12 +1,12 @@
 // src/components/Test.jsx
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useAudioRecorder } from "react-audio-voice-recorder";
-import "./Test.css";
+import "../../styles/Test.css";
 import { useDropzone } from "react-dropzone";
 import { useLocation, useNavigate } from "react-router-dom";
 import PuffLoader from "react-spinners/PuffLoader";
-import { ConvertWebmToWav } from "./ConvertWebmToWav";
-import { useLanguage } from './LanguageContext';
+import { ConvertWebmToWav } from "../../components/ConvertWebmToWav";
+import { useLanguage } from '../../components/LanguageContext';
 
 // file size limitation (5MB)
 const MAX_FILE_SIZE_MB = 5;

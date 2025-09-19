@@ -24,7 +24,7 @@
 }
 
 .authentication .half {
-  background: no-repeat url(../public/images/Login.png);
+  background: no-repeat url(../../public/images/Login.png);
   background-size: cover;
   background-position: center; /* keeps focal point across sizes */
 }
@@ -35,7 +35,7 @@
 }
 
 .authentication .halfForgot {
-  background: no-repeat url(../public/images/Forget.png);
+  background: no-repeat url(../../public/images/Forget.png);
   background-size: cover;
   background-position: center; /* keeps focal point across sizes */
 }
@@ -48,7 +48,7 @@
 }
 
 .authentication .halfRegister {
-  background: no-repeat url(../public/images/Register.png);
+  background: no-repeat url(../../public/images/Register.png);
   background-size: cover;
   background-position: center;
   margin-right: 1%;

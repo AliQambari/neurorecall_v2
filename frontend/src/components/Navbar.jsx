@@ -1,7 +1,7 @@
 // src/components/Navbar.jsx
 import React, { useEffect, useState, useContext, useRef, Fragment } from "react";
 import { Collapse } from 'bootstrap';
-import "./Navbar.css";
+import "../styles/Navbar.css";
 import { AuthContext } from "./AuthContext";
 import { Link, useLocation } from "react-router-dom";
 import LogoutAlert from "./LogoutAlert";

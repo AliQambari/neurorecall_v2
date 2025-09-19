@@ -1,7 +1,7 @@
 import React from "react";
-import "./Tests.css";
+import "../../styles/Tests.css";
 import { Link } from "react-router-dom";
-import { useLanguage } from './LanguageContext';
+import { useLanguage } from '../../components/LanguageContext';
 
 export default function Tests() {
   const { language } = useLanguage();

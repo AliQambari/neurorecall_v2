@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import "./Home.css";
-import { AuthContext } from "./AuthContext";
-import { useLanguage } from './LanguageContext';
+import "../../styles/Home.css";
+import { AuthContext } from "../../components/AuthContext";
+import { useLanguage } from '../../components/LanguageContext';
 import { GiBrain } from "react-icons/gi";
 import { BsClipboard2DataFill } from "react-icons/bs";
 import { FaHeadSideVirus } from "react-icons/fa6";

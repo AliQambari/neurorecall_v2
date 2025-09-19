@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 // import DonutChart from 'react-donut-chart';
-import './Result.css';
-import { useLanguage } from './LanguageContext';
+import '../../styles/Result.css';
+import { useLanguage } from '../../components/LanguageContext';
 
 export default function Result() {
   const { state } = useLocation();

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { createPortal } from 'react-dom';
 import { LuBell, LuBellRing, LuCheck, LuCheckCheck, LuX } from 'react-icons/lu';
-import './NotificationBell.css';
+import '../styles/NotificationBell.css';
 import { useLocation } from 'react-router-dom';
 import { useLanguage } from "./LanguageContext";
 

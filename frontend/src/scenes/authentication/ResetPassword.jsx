@@ -1,9 +1,9 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { useParams } from "react-router-dom";
-import "./Authentication.css";
-import AuthAlert from "./AuthAlert";
+import "../../styles/Authentication.css";
+import AuthAlert from "../../components/AuthAlert";
 import PuffLoader from "react-spinners/PuffLoader";
-import { useLanguage } from './LanguageContext';
+import { useLanguage } from '../../components/LanguageContext';
 
 export default function ResetPassword() {
     const [newPassword, setNewPassword] = useState("");

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "react-data-table-component";
-import { useLanguage } from './LanguageContext';
-import ProfileImageUpload from "./ProfileImageUpload";
+import { useLanguage } from '../../components/LanguageContext';
+import ProfileImageUpload from "../../components/ProfileImageUpload";
 import {
   GoCheckCircle,
   GoXCircle,
@@ -18,9 +18,9 @@ import english from "react-date-object/locales/gregorian_en";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import transition from "react-element-popper/animations/transition";
-import "./UserProfileHome.css";
+import "../../styles/UserProfileHome.css";
 import UserDetails from "./UserDetails";
-import UserDetailsModal from "./UserDetailsModal";
+import UserDetailsModal from "../../components/UserDetailsModal";
 
 
 

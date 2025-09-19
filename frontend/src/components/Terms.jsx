@@ -1,5 +1,5 @@
 import React from "react";
-import "./Terms.css";
+import "../styles/Terms.css";
 import { useLanguage } from './LanguageContext';
 import { LuShieldCheck, LuMic, LuFileCheck } from "react-icons/lu";
 

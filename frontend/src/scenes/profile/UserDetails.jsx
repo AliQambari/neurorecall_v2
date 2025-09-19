@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
-import { useLanguage } from './LanguageContext';
+import { useLanguage } from '../../components/LanguageContext';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine
 } from 'recharts';
-import "./UserDetails.css";
+import "../../styles/UserDetails.css";
 
 
 const UserDetails = ({ data, selectedUser }) => {

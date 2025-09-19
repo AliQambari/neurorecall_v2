@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./UserDetailsModal.css";
+import "../styles/UserDetailsModal.css";
 
 const UserDetailsModal = ({ isOpen, onRequestClose, onExited, title, children }) => {
   const [isVisible, setIsVisible] = useState(false); // internal visibility for animation

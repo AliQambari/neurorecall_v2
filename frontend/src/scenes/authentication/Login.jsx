@@ -1,10 +1,10 @@
 // src/components/Login.jsx
 import React, { useState, useContext } from "react";
-import "./Authentication.css";
+import "../../styles/Authentication.css";
 import { useNavigate, Link } from "react-router-dom";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "../../components/AuthContext";
 import PuffLoader from "react-spinners/PuffLoader";
-import { useLanguage } from "./LanguageContext";
+import { useLanguage } from "../../components/LanguageContext";
 
 export default function Login() {
   const navigate = useNavigate();

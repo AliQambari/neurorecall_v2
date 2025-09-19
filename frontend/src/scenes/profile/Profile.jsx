@@ -1,6 +1,6 @@
 import React, { useContext, Fragment } from "react";
-import "./Profile.css";
-import { AuthContext } from "./AuthContext";
+import "../../styles/Profile.css";
+import { AuthContext } from "../../components/AuthContext";
 import AdminProfile from "./AdminProfile";
 import UserProfile from "./UserProfile";
 

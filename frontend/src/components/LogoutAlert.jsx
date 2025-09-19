@@ -2,7 +2,7 @@ import { Fragment, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import { useLanguage } from './LanguageContext';
-import "./LogoutAlert.css";
+import "../styles/LogoutAlert.css";
 
 function LogoutAlert({ alertText, buttonText, isVisible, onClose }) {
   //const [isLoading, setIsLoading] = useState(false);

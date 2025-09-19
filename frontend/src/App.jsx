@@ -1,16 +1,16 @@
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
-import Home from "./Home";
+import Home from "./scenes/landing/Home";
 import { useEffect, useState } from "react";
-import Navbar from "./Navbar";
-import Register from "./Register";
-import Login from "./Login";
-import Terms from "./Terms";
-import Forgotpassword from "./Forgotpassword";
-import ResetPassword from "./ResetPassword";
-import Profile from "./Profile";
-import Help from "./Help";
-import { useLanguage } from "./LanguageContext";
+import Navbar from "./components/Navbar";
+import Register from "./scenes/authentication/Register";
+import Login from "./scenes/authentication/Login";
+import Terms from "./components/Terms";
+import Forgotpassword from "./scenes/authentication/Forgotpassword";
+import ResetPassword from "./scenes/authentication/ResetPassword";
+import Profile from "./scenes/profile/Profile";
+import Help from "./components/Help";
+import { useLanguage } from "./components/LanguageContext";
 
 function App() {
   const [home, setHome] = useState(true);
