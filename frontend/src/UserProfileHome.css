@@ -57,10 +57,6 @@ select:invalid { color: gray; }
 
 .btn-approved-filter:hover, .btn-approved { color: white; background-color: #22326E;}
 .btn-approved:hover { background-color: #2F46A1;}
-/* .custom-tooltip {
-  --bs-tooltip-bg: var(--bd-violet-bg);
-  --bs-tooltip-color: var(--bs-white);
-} */
 
 .btn-remove-filter { background-color: #22326E; color: #fff; padding: 9px 20px; }
 .btn-remove-filter:hover { color: #fff; background-color: #2F46A1;}
@@ -84,11 +80,13 @@ select:invalid { color: gray; }
 
 /* Card */
 .username-link {
-  text-decoration: none;
-  color: inherit;
+  border: none;
+  background-color: transparent;
+  border-radius: 5px;
+  padding: 3px 7px;
 }
 
-.username-link:hover { color: #2F46A1; }
+.username-link:hover { color: #2F46A1 }
 
 .profile .result-card {
   background: #fff;

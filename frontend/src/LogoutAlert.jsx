@@ -2,7 +2,7 @@ import { Fragment, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import { useLanguage } from './LanguageContext';
-
+import { Modal } from 'bootstrap';
 
 function LogoutAlert({ alertText, buttonText, isVisible, onClose }) {
   //const [isLoading, setIsLoading] = useState(false);
@@ -35,8 +35,8 @@ function LogoutAlert({ alertText, buttonText, isVisible, onClose }) {
     const modalElement = document.getElementById("exampleModalCenter");
     if (!modalElement) return;
 
-    // Create the modal instance once
-    const modal = new window.bootstrap.Modal(modalElement);
+    // ✅ Use imported Modal class directly
+    const modal = new Modal(modalElement);
 
     // Add event listener to dispose of the modal after it’s hidden
     modalElement.addEventListener("hidden.bs.modal", () => {

@@ -20,6 +20,7 @@ import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import transition from "react-element-popper/animations/transition";
 import "./UserProfileHome.css";
+import UserDetails from "./UserDetails";
 
 
 
@@ -52,7 +53,7 @@ const UserResults = () => {
 
   const columns = [
     { name: t('Username', 'نام کاربری'), selector: (row) => 
-      <Link className="username-link" to={`/admin/user/${row.username}`}>{row.username}</Link>
+      <button className="username-link" type="button">{row.username}</button>
     , sortable: false, width: '180px' },
     { name: t('Age', 'سن'), selector: (row) => row.age, sortable: true, width: '80px' },
     { name: t('Gender', 'جنسیت'), selector: (row) => (row.gender === 'female' ? t('female', 'زن') : t('male', 'مرد')), sortable: true, width: '110px' },
@@ -387,7 +388,7 @@ const UserResults = () => {
 
                           {/* Identity row */}
                           <div className="px-3 pt-2 pb-1 d-flex flex-wrap gap-2 align-items-center">
-                            <span className="chip"><Link className="username-link" to={`/admin/user/${row.username}`}><LuUser aria-hidden /> {row.username}</Link></span>
+                            <span className="chip"><button className="username-link" type="button"><LuUser aria-hidden /> {row.username}</button></span>
                             <span className="chip">{t('Age', 'سن')}: {row.age}</span>
                             <span className="chip">{t('Gender', 'جنسیت')}: {gLabel}</span>
                           </div>
@@ -408,9 +409,6 @@ const UserResults = () => {
                               <GoClock aria-hidden />
                               {row.test_time}
                             </span>
-                            <Link to={`/admin/user/${row.username}`} className="btn btn-outline-primary btn-sm">
-                              {t('View details', 'نمایش جزئیات')}
-                            </Link>
                           </footer>
                         </article>
                       );

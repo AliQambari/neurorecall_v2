@@ -1,5 +1,6 @@
 // src/components/Navbar.jsx
-import React, { useEffect, useState, useContext, Fragment } from "react";
+import React, { useEffect, useState, useContext, useRef, Fragment } from "react";
+import { Collapse } from 'bootstrap';
 import "./Navbar.css";
 import { AuthContext } from "./AuthContext";
 import { Link, useLocation } from "react-router-dom";
@@ -18,6 +19,7 @@ import { GoHome } from "react-icons/go";
 import NotificationBell from "./NotificationBell";
 
 
+
 export default function Navbar() {
   const { logged, isAdmin } = useContext(AuthContext);
 
@@ -29,6 +31,10 @@ export default function Navbar() {
 
   // Logout Modal
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // Hamburger Menu
+  const collapseRef = useRef(null);
+  const collapseInstanceRef = useRef(null);
 
   const location = useLocation();
   const { language, toggleLanguage } = useLanguage();
@@ -46,23 +52,52 @@ export default function Navbar() {
     setThemeClass(onHome ? "navbar-dark" : "navbar-light"); // critical for toggler icon
   }, [location.pathname]);
 
+
+  // Close Hamburger Menu
+  const closeCollapseSafe = () => {
+    if (window.innerWidth >= 992) return; // only on mobile/tablet
+
+    const instance = collapseInstanceRef.current;
+    if (instance) {
+      // use API
+      instance.hide();
+    } else {
+      // fallback to toggler click if instance not ready
+      const toggler = document.querySelector('.navbar-toggler');
+      if (toggler) toggler.click();
+    }
+  };
+
+
+  useEffect(() => {
+    const el = collapseRef.current;
+    if (!el) return;
+
+    // getOrCreateInstance prevents double instances (works well with StrictMode)
+    collapseInstanceRef.current = Collapse.getOrCreateInstance(el, { toggle: false });
+
+    return () => {
+      if (collapseInstanceRef.current) {
+        collapseInstanceRef.current.dispose();
+        collapseInstanceRef.current = null;
+      }
+    };
+  }, [logged]);
+
   useEffect(() => {
     const closeMenu = () => {
       if (window.innerWidth < 992) {
-        const collapse = document.getElementById('navbarSupportedContent');
-        if (collapse && collapse.classList.contains('show')) {
-          const toggler = document.querySelector('.navbar-toggler');
-          if (toggler) {
-            toggler.click();
-          }
+        const el = collapseRef.current;
+        if (el && el.classList.contains('show')) {
+          closeCollapseSafe();
         }
       }
     };
 
     const handleClickOutside = (event) => {
-      const navbar = document.querySelector('.navbar-collapse');
+      const navbar = collapseRef.current;
       const toggler = document.querySelector('.navbar-toggler');
-      if (navbar && !navbar.contains(event.target) && !toggler.contains(event.target)) {
+      if (navbar && !navbar.contains(event.target) && !(toggler && toggler.contains(event.target))) {
         closeMenu();
       }
     };
@@ -87,27 +122,36 @@ export default function Navbar() {
             NeuroRecall
           </Link>
 
-          {/* Do not apply custom color classes here; themeClass controls icon */}
           <button
             className="navbar-toggler"
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent"
             aria-expanded="false"
             aria-label="Toggle navigation"
+            onClick={() => {
+              if (collapseInstanceRef.current) {
+                const isShown = collapseRef.current.classList.contains('show');
+                if (isShown) {
+                  collapseInstanceRef.current.hide();
+                } else {
+                  collapseInstanceRef.current.show();
+                }
+              }
+            }}
           >
             <span className="navbar-toggler-icon" />
           </button>
 
+
           <div
+            ref={collapseRef}
             className="collapse navbar-collapse"
             id="navbarSupportedContent"
             style={{ justifyContent: "space-between" }} // keeps LTR/RTL symmetric without Bootstrap RTL build
           >
             <ul className="navbar-nav mb-2 mb-lg-0 pr-0 nav-ul">
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
+                <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
                   <GoHome className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Home" : "خانه"}
                 </Link>
@@ -125,13 +169,13 @@ export default function Navbar() {
 
             <ul className="navbar-nav mb-2 mb-lg-0 mt-1">
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/login" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
+                <Link className={`nav-link ${linkClass}`} to="/login" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
                   <LuLogIn className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Login" : "ورود"}
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link btn btn-primary px-4 navbarBtn" to="/register" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
+                <Link className="nav-link btn btn-primary px-4 navbarBtn" to="/register" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
                   <LuUserPlus className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Register →" : "ثبت نام"}
                 </Link>
@@ -165,39 +209,48 @@ export default function Navbar() {
             NeuroRecall
           </Link>
 
-          {/* Toggler icon visibility fixed by themeClass */}
           <button
             className="navbar-toggler"
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent"
             aria-expanded="false"
             aria-label="Toggle navigation"
+            onClick={() => {
+              if (collapseInstanceRef.current) {
+                const isShown = collapseRef.current.classList.contains('show');
+                if (isShown) {
+                  collapseInstanceRef.current.hide();
+                } else {
+                  collapseInstanceRef.current.show();
+                }
+              }
+            }}
           >
             <span className="navbar-toggler-icon" />
           </button>
 
+
           <div
+            ref={collapseRef}
             className="collapse navbar-collapse"
             id="navbarSupportedContent"
             style={{ justifyContent: "space-between" }}
           >
             <ul className="navbar-nav nav-ul mb-2 mb-lg-0">
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
+                <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
                   <GoHome className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Home" : "خانه"}
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/profile" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
+                <Link className={`nav-link ${linkClass}`} to="/profile" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
                   <LuUser className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Profile" : "پروفایل"}
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/profile/tests" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
+                <Link className={`nav-link ${linkClass}`} to="/profile/tests" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
                   <LuClipboardList className="nav-ico" aria-hidden="true" />
                   {language === "en" ? "Tests" : "آزمون ها"}
                 </Link>
@@ -205,7 +258,7 @@ export default function Navbar() {
 
               {isAdmin ? (
                 <li className="nav-item">
-                  <Link className={`nav-link ${linkClass}`} to="/profile/user-results" onClick={() => window.innerWidth < 992 && document.querySelector('.navbar-toggler').click()}>
+                  <Link className={`nav-link ${linkClass}`} to="/profile/user-results" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
                     <LuUsers className="nav-ico" aria-hidden="true" />
                     {language === "en" ? "User Results" : "نتایج کاربران"}
                   </Link>
