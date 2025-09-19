@@ -73,15 +73,23 @@ export default function Navbar() {
     const el = collapseRef.current;
     if (!el) return;
 
-    // getOrCreateInstance prevents double instances (works well with StrictMode)
+    // getOrCreateInstance prevents double instances
     collapseInstanceRef.current = Collapse.getOrCreateInstance(el, { toggle: false });
 
     return () => {
       if (collapseInstanceRef.current) {
-        collapseInstanceRef.current.dispose();
+        try {
+          // Immediately hide without transition
+          collapseInstanceRef.current._isTransitioning = false;
+          collapseInstanceRef.current.hide();
+          collapseInstanceRef.current.dispose();
+        } catch (e) {
+          console.warn("Safe collapse cleanup:", e);
+        }
         collapseInstanceRef.current = null;
       }
     };
+
   }, [logged]);
 
   useEffect(() => {
@@ -129,7 +137,7 @@ export default function Navbar() {
             aria-expanded="false"
             aria-label="Toggle navigation"
             onClick={() => {
-              if (collapseInstanceRef.current) {
+              if (collapseRef.current && collapseInstanceRef.current) {
                 const isShown = collapseRef.current.classList.contains('show');
                 if (isShown) {
                   collapseInstanceRef.current.hide();
@@ -185,117 +193,119 @@ export default function Navbar() {
         </div>
       </nav>
     );
-  }
+  } else {
+    return (
+      <Fragment>
+        <LogoutAlert
+          alertText={
+            language === "en"
+              ? "Are you sure you want to log out of your account?"
+              : "آیا مطمئن هستید که می خواهید از حساب خود خارج شوید؟"
+          }
+          buttonText={language === "en" ? "Log out" : "خروج"}
+          isVisible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+        />
 
-  return (
-    <Fragment>
-      <LogoutAlert
-        alertText={
-          language === "en"
-            ? "Are you sure you want to log out of your account?"
-            : "آیا مطمئن هستید که می خواهید از حساب خود خارج شوید؟"
-        }
-        buttonText={language === "en" ? "Log out" : "خروج"}
-        isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-      />
+        <nav
+          dir={language === "en" ? "ltr" : "rtl"}
+          className={`navbar navbar-expand-lg ${themeClass} px-lg-5 px-3 pt-3 pb-3 ${bgClass} ${generalClass}`}
+        >
+          <div className="container-fluid px-lg-5 px-3">
+            <Link className={`navbar-brand ${linkClass} navbarBrand`} to="/">
+              NeuroRecall
+            </Link>
 
-      <nav
-        dir={language === "en" ? "ltr" : "rtl"}
-        className={`navbar navbar-expand-lg ${themeClass} px-lg-5 px-3 pt-3 pb-3 ${bgClass} ${generalClass}`}
-      >
-        <div className="container-fluid px-lg-5 px-3">
-          <Link className={`navbar-brand ${linkClass} navbarBrand`} to="/">
-            NeuroRecall
-          </Link>
-
-          <button
-            className="navbar-toggler"
-            type="button"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-            onClick={() => {
-              if (collapseInstanceRef.current) {
-                const isShown = collapseRef.current.classList.contains('show');
-                if (isShown) {
-                  collapseInstanceRef.current.hide();
-                } else {
-                  collapseInstanceRef.current.show();
+            <button
+              className="navbar-toggler"
+              type="button"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+              onClick={() => {
+                if (collapseRef.current && collapseInstanceRef.current) {
+                  const isShown = collapseRef.current.classList.contains('show');
+                  if (isShown) {
+                    collapseInstanceRef.current.hide();
+                  } else {
+                    collapseInstanceRef.current.show();
+                  }
                 }
-              }
-            }}
-          >
-            <span className="navbar-toggler-icon" />
-          </button>
+              }}
+            >
+              <span className="navbar-toggler-icon" />
+            </button>
 
 
-          <div
-            ref={collapseRef}
-            className="collapse navbar-collapse"
-            id="navbarSupportedContent"
-            style={{ justifyContent: "space-between" }}
-          >
-            <ul className="navbar-nav nav-ul mb-2 mb-lg-0">
-              <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
-                  <GoHome className="nav-ico" aria-hidden="true" />
-                  {language === "en" ? "Home" : "خانه"}
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/profile" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
-                  <LuUser className="nav-ico" aria-hidden="true" />
-                  {language === "en" ? "Profile" : "پروفایل"}
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className={`nav-link ${linkClass}`} to="/profile/tests" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
-                  <LuClipboardList className="nav-ico" aria-hidden="true" />
-                  {language === "en" ? "Tests" : "آزمون ها"}
-                </Link>
-              </li>
-
-              {isAdmin ? (
+            <div
+              ref={collapseRef}
+              className="collapse navbar-collapse"
+              id="navbarSupportedContent"
+              style={{ justifyContent: "space-between" }}
+            >
+              <ul className="navbar-nav nav-ul mb-2 mb-lg-0">
                 <li className="nav-item">
-                  <Link className={`nav-link ${linkClass}`} to="/profile/user-results" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
-                    <LuUsers className="nav-ico" aria-hidden="true" />
-                    {language === "en" ? "User Results" : "نتایج کاربران"}
+                  <Link className={`nav-link ${linkClass}`} to="/" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                    <GoHome className="nav-ico" aria-hidden="true" />
+                    {language === "en" ? "Home" : "خانه"}
                   </Link>
                 </li>
-              ) : null}
-
-              <li className="nav-item">
-                <button
-                  onClick={toggleLanguage}
-                  className={`language-toggle ${linkClass}`}
-                >
-                  <GrLanguage style={{ marginInlineEnd: "0.5rem" }} />
-                  {language === "en" ? "Persian" : "انگلیسی"}
-                </button>
-              </li>
-            </ul>
-
-            <ul className="navbar-nav mb-2 mb-lg-0 mt-2">
-              {isAdmin && (
-                <li className="nav-item d-flex align-items-center mb-3">
-                  <NotificationBell />
+                <li className="nav-item">
+                  <Link className={`nav-link ${linkClass}`} to="/profile" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                    <LuUser className="nav-ico" aria-hidden="true" />
+                    {language === "en" ? "Profile" : "پروفایل"}
+                  </Link>
                 </li>
-              )}
-              <li className="nav-item">
-                <button
-                  className="nav-link btn btn-primary px-4 navbarBtn logoutBtn"
-                  onClick={logoutHandler}
-                >
-                  {language === "en" ? `Logout ` : "خروج"}
-                  <LuLogOut style={{ marginInlineStart: "0.5rem" }} />
-                </button>
-              </li>
-            </ul>
+                <li className="nav-item">
+                  <Link className={`nav-link ${linkClass}`} to="/profile/tests" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                    <LuClipboardList className="nav-ico" aria-hidden="true" />
+                    {language === "en" ? "Tests" : "آزمون ها"}
+                  </Link>
+                </li>
+
+                {isAdmin ? (
+                  <li className="nav-item">
+                    <Link className={`nav-link ${linkClass}`} to="/profile/user-results" onClick={() => window.innerWidth < 992 && closeCollapseSafe()}>
+                      <LuUsers className="nav-ico" aria-hidden="true" />
+                      {language === "en" ? "User Results" : "نتایج کاربران"}
+                    </Link>
+                  </li>
+                ) : null}
+
+                <li className="nav-item">
+                  <button
+                    onClick={toggleLanguage}
+                    className={`language-toggle ${linkClass}`}
+                  >
+                    <GrLanguage style={{ marginInlineEnd: "0.5rem" }} />
+                    {language === "en" ? "Persian" : "انگلیسی"}
+                  </button>
+                </li>
+              </ul>
+
+              <ul className="navbar-nav mb-2 mb-lg-0 mt-2">
+                {isAdmin && (
+                  <li className="nav-item d-flex align-items-center mb-3">
+                    <NotificationBell />
+                  </li>
+                )}
+                <li className="nav-item">
+                  <button
+                    className="nav-link btn btn-primary px-4 navbarBtn logoutBtn"
+                    onClick={logoutHandler}
+                  >
+                    {language === "en" ? `Logout ` : "خروج"}
+                    <LuLogOut style={{ marginInlineStart: "0.5rem" }} />
+                  </button>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
-      </nav>
-    </Fragment>
-  );
+        </nav>
+      </Fragment>
+    );
+  }
+
+  
 }
 
