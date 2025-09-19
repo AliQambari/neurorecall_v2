@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "react-data-table-component";
-import { Link } from "react-router-dom";
 import { useLanguage } from './LanguageContext';
 import ProfileImageUpload from "./ProfileImageUpload";
 import {
@@ -21,6 +20,7 @@ import persian_fa from "react-date-object/locales/persian_fa";
 import transition from "react-element-popper/animations/transition";
 import "./UserProfileHome.css";
 import UserDetails from "./UserDetails";
+import UserDetailsModal from "./UserDetailsModal";
 
 
 
@@ -46,14 +46,37 @@ function useIsDesktop(breakpoint = 992) {
 }
 
 const UserResults = () => {
+  // Language States
   const { language } = useLanguage();
   const t = (en, fa) => (language === 'en' ? en : fa);
   const dir = language === 'en' ? 'ltr' : 'rtl';
+
+  // Breakpoint State
   const isDesktop = useIsDesktop(992);
+
+  // Selected User and User Details State
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // When username is clicked
+  const handleOpenModal = (username) => {
+    setSelectedUser(username);
+    setIsModalOpen(true);
+  };
+
+  // request close: only change isModalOpen (DO NOT clear selectedUser yet)
+  const handleRequestClose = () => {
+    setIsModalOpen(false);
+  };
+
+  // after modal fully closed: clear selectedUser so content unmounts
+  const handleAfterClose = () => {
+    setSelectedUser(null);
+  };
 
   const columns = [
     { name: t('Username', 'نام کاربری'), selector: (row) => 
-      <button className="username-link" type="button">{row.username}</button>
+      <button className="username-link" type="button" onClick={() => handleOpenModal(row.username)}>{row.username}</button>
     , sortable: false, width: '180px' },
     { name: t('Age', 'سن'), selector: (row) => row.age, sortable: true, width: '80px' },
     { name: t('Gender', 'جنسیت'), selector: (row) => (row.gender === 'female' ? t('female', 'زن') : t('male', 'مرد')), sortable: true, width: '110px' },
@@ -123,6 +146,7 @@ const UserResults = () => {
         const rows = result.map((item) => ({
           ...item,
           id: `${item.username}-${item.test_number}-${item.attempt_number}`,
+          test_time_raw: item.test_time, // keep original ISO string for sorting in UserDetails component
           test_time: item.test_time ? new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'fa-IR', {
             year: 'numeric',
             month: '2-digit',
@@ -388,7 +412,7 @@ const UserResults = () => {
 
                           {/* Identity row */}
                           <div className="px-3 pt-2 pb-1 d-flex flex-wrap gap-2 align-items-center">
-                            <span className="chip"><button className="username-link" type="button"><LuUser aria-hidden /> {row.username}</button></span>
+                            <span className="chip"><button className="username-link" type="button" onClick={() => handleOpenModal(row.username)}><LuUser aria-hidden /> {row.username}</button></span>
                             <span className="chip">{t('Age', 'سن')}: {row.age}</span>
                             <span className="chip">{t('Gender', 'جنسیت')}: {gLabel}</span>
                           </div>
@@ -401,6 +425,9 @@ const UserResults = () => {
                                   <div className="round-value">{v}</div>
                                 </li>
                               ))}
+                              <li className="round">
+                                <span className="round-attempt">{t('Attempt:', 'تلاش:')} {row.attempt_number}</span>
+                              </li>
                             </ul>
                           </div>
 
@@ -417,6 +444,18 @@ const UserResults = () => {
                 )}
               </section>
             )}
+
+            {/* Modal for showing user details */}
+            <UserDetailsModal
+              isOpen={isModalOpen}
+              title={t('User Details', 'جزئیات کاربر') + (selectedUser ? ` - ${selectedUser}` : '')}
+              onRequestClose={handleRequestClose}
+              onExited={handleAfterClose}
+            >
+              {selectedUser && (
+                <UserDetails data={data} selectedUser={selectedUser} />
+              )}
+            </UserDetailsModal>
           </div>
         </div>
       </div>
