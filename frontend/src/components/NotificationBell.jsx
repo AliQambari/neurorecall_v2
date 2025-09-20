@@ -14,7 +14,9 @@ const NotificationBell = () => {
   const dropdownRef = useRef(null);
 
   const location = useLocation();
+
   const { language } = useLanguage();
+  const dir = language === 'en' ? 'ltr' : 'rtl';
 
   const onHome = location.pathname === "/";
   const iconColor = onHome ? "white" : "#2d4059";
@@ -146,13 +148,14 @@ const NotificationBell = () => {
   const formatMessage = (message) => {
     if (!message) return '';
     if (message.includes(' | ')) {
-      return message.split(' | ')[0];
+      if (language === "en") return message.split(' | ')[0];
+      else return message.split(' | ')[1];
     }
     return message;
   };
 
   return (
-    <div className="notification-bell" ref={dropdownRef}>
+    <div className="notification-bell" ref={dropdownRef} dir={dir}>
       <button
         className="notification-bell-button"
         onClick={toggleDropdown}
@@ -183,6 +186,7 @@ const NotificationBell = () => {
           <div className="notification-backdrop d-md-none" onClick={() => setIsOpen(false)} />
           <div
             className="notification-dropdown notification-portal"
+            dir={dir}
             style={(() => {
               if (!dropdownRef.current) return { zIndex: 999999 };
 
