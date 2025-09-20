@@ -101,7 +101,7 @@
 }
 
 /* Mobile responsiveness - positioning handled by JS */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .notification-portal {
     max-height: 80vh !important;
   }
@@ -163,20 +163,7 @@
   font-size: 1.1rem;
 }
 
-/* Ensure close button is always visible on mobile */
-@media (max-width: 768px) {
-  .close-btn {
-    color: #495057 !important;
-    font-size: 1.2rem;
-    padding: 8px;
-  }
-  
-  .mark-all-read-btn {
-    color: #495057 !important;
-  }
-}
-
-/* Mobile backdrop */
+/* Mobile & Tablet backdrop */
 .notification-backdrop {
   position: fixed;
   top: 0;
@@ -188,8 +175,8 @@
 }
 
 /* Hide close button and backdrop on desktop */
-@media (min-width: 769px) {
-  .d-md-none {
+@media (min-width: 993px) {
+  .show-on-mobile-tablet {
     display: none !important;
   }
 }
@@ -199,8 +186,8 @@
   overflow-y: auto;
 }
 
-/* Mobile notification list adjustments */
-@media (max-width: 768px) {
+/* Mobile & Tablet notification list adjustments */
+@media (max-width: 992px) {
   .notification-list {
     max-height: calc(80vh - 120px);
   }

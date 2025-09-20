@@ -183,7 +183,7 @@ const NotificationBell = () => {
 
       {isOpen && createPortal(
         <>
-          <div className="notification-backdrop d-md-none" onClick={() => setIsOpen(false)} />
+          <div className="notification-backdrop show-on-mobile-tablet" onClick={() => setIsOpen(false)} />
           <div
             className="notification-dropdown notification-portal"
             dir={dir}
@@ -192,7 +192,8 @@ const NotificationBell = () => {
 
               const rect = dropdownRef.current.getBoundingClientRect();
               const isRTL = language === 'fa';
-              const isMobile = window.innerWidth <= 768;
+              // Mobile or Tablet
+              const isMobile = window.innerWidth <= 992;
 
               if (isMobile) {
                 return {
