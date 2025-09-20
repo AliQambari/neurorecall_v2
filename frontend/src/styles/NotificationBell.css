@@ -1,7 +1,6 @@
 .notification-bell {
   position: relative;
   display: inline-block;
-  z-index: 10000;
 }
 
 .notification-bell-button {
@@ -98,34 +97,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: 320px;
   max-height: 400px;
-  z-index: 99999;
   overflow: hidden;
-}
-
-/* Force dropdown above everything on desktop */
-@media (min-width: 769px) {
-  .notification-dropdown {
-    z-index: 2147483647 !important;
-    position: absolute !important;
-  }
-  
-  .notification-bell {
-    z-index: 2147483647 !important;
-  }
-  
-  .notification-bell:hover {
-    z-index: 2147483647 !important;
-  }
-  
-  .notification-bell-button:hover {
-    z-index: 2147483647 !important;
-    transform: none !important;
-  }
-}
-
-.notification-portal {
-  position: fixed !important;
-  z-index: 999999 !important;
 }
 
 /* Mobile responsiveness - positioning handled by JS */
@@ -326,69 +298,4 @@
 
 .notification-footer small {
   color: #6c757d;
-}
-
-/* Dark theme support */
-@media (prefers-color-scheme: dark) {
-  .notification-dropdown {
-    background: #343a40;
-    border-color: #495057;
-    color: #f8f9fa;
-  }
-
-  .notification-header {
-    background-color: #495057;
-    border-bottom-color: #6c757d;
-  }
-
-  .notification-header h4 {
-    color: #f8f9fa;
-  }
-
-  .notification-item {
-    border-bottom-color: #495057;
-  }
-
-  .notification-item:hover {
-    background-color: #495057;
-  }
-
-  .notification-item.unread {
-    background-color: #1e3a5f;
-  }
-
-  .notification-message {
-    color: #f8f9fa;
-  }
-
-  .notification-footer {
-    background-color: #495057;
-    border-top-color: #6c757d;
-  }
-}
-
-/* RTL support */
-[dir="rtl"] .notification-dropdown {
-  right: auto;
-  left: 0;
-}
-
-[dir="rtl"] .notification-item.unread {
-  border-left: none;
-  border-right: 3px solid #2196f3;
-}
-
-[dir="rtl"] .notification-item.unread::before {
-  left: auto;
-  right: 8px;
-}
-
-[dir="rtl"] .notification-content {
-  margin-left: 0;
-  margin-right: 12px;
-}
-
-[dir="rtl"] .mark-read-btn {
-  margin-left: 0;
-  margin-right: 8px;
 }
